@@ -1,0 +1,15 @@
+arfcn: 3,bsic: 7,dBm: -63,mcc: 404,mnc: 70,lac: 660,cellId: 1163,cellStatus: CELL_SUITABLE,numArfcn: 2,arfcn: 562 565,numChannels: 7,array: 1 2 3 4 5 6 30
+
+arfcn: 57,bsic: 52,dBm: -71,mcc: 404,mnc: 60,lac: 2446,cellId: 13981,cellStatus: CELL_SUITABLE,numArfcn: 7,arfcn: 31 32 33 53 54 55 56,numChannels: 6,array: 57 58 59 60 61 62
+
+arfcn: 103,bsic: 41,dBm: -74,mcc: 404,mnc: 59,lac: 6201,cellId: 30971,cellStatus: CELL_SUITABLE,numArfcn: 13,arfcn: 99 103 106 110 113 117 118 119 120 121 122 123 124,numChannels: 7,array: 98 100 102 103 111 112 114
+
+arfcn: 62,bsic: 31,dBm: -78,mcc: 404,mnc: 60,lac: 2446,cellId: 11948,cellStatus: CELL_SUITABLE,numArfcn: 7,arfcn: 31 32 33 53 54 55 56,numChannels: 6,array: 57 58 59 60 61 62
+
+arfcn: 6,bsic: 13,dBm: -82,mcc: 404,mnc: 70,lac: 660,cellId: 1162,cellStatus: CELL_SUITABLE,numArfcn: 2,arfcn: 566 611,numChannels: 7,array: 1 2 3 4 5 6 30
+
+arfcn: 3,bsic: 7,dBm: -63,mcc: 404,mnc: 70,lac: 660,cellId: 1163,cellStatus: CELL_SUITABLE,numArfcn: 2,arfcn: 562 565,numChannels: 7,array: 1 2 3 4 5 6 30
+
+arfcn: 62,bsic: 31,dBm: -78,mcc: 404,mnc: 60,lac: 2446,cellId: 11948,cellStatus: CELL_SUITABLE,numArfcn: 7,arfcn: 31 32 33 53 54 55 56,numChannels: 6,array: 57 58 59 60 61 62
+
+arfcn: 3,bsic: 7,dBm: -63,mcc: 404,mnc: 70,lac: 660,cellId: 1163,cellStatus: CELL_SUITABLE,numArfcn: 2,arfcn: 562 565,numChannels: 7,array: 1 2 3 4 5 6 30

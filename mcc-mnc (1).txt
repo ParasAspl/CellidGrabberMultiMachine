@@ -1,0 +1,126 @@
+404||01||Vodafone Idea||Haryana||Operational||GSM 900||
+404||02||Airtel||Punjab||Operational||GSM 900||
+404||03||Airtel||Himachal Pradesh||Operational||GSM 900||
+404||04||Vodafone Idea||Delhi & NCR||Operational||GSM 1800||
+404||05||Vodafone Idea||Gujarat||Operational||GSM 900||Former Hutch / Fascel /Vodafone India
+404||07||Vodafone Idea||Andhra Pradesh and Telangana||Operational||GSM 900||former IDEA
+404||1||Vodafone Idea||Haryana||Operational||GSM 900||
+404||2||Airtel||Punjab||Operational||GSM 900||
+404||3||Airtel||Himachal Pradesh||Operational||GSM 900||
+404||4||Vodafone Idea||Delhi & NCR||Operational||GSM 1800||
+404||5||Vodafone Idea||Gujarat||Operational||GSM 900||Former Hutch / Fascel /Vodafone India
+404||7||Vodafone Idea||Andhra Pradesh and Telangana||Operational||GSM 900||former IDEA
+404||10||Airtel||Delhi & NCR||Operational||GSM 900||
+404||11||Vodafone Idea||Delhi & NCR||Operational||GSM 900 / GSM 1800||former Vodafone India
+404||12||Vodafone Idea||Haryana||Operational||GSM 900||Former Escotel IDEA
+404||13||Vodafone Idea||Andhra Pradesh and Telangana||Operational||GSM 1800||former Vodafone India
+404||14||Vodafone Idea||Punjab||Operational||GSM 900 / GSM 1800||Former Spice IDEA
+404||15||Vodafone Idea||Uttar Pradesh (East)||Operational||GSM 900||former Vodafone India
+404||16||Airtel||North East||Operational||GSM 900||Former Hexacom
+404||19||Vodafone Idea||Kerala||Operational||GSM 900 / GSM 1800||Former Escotel IDEA
+404||20||Vodafone Idea||Mumbai||Operational||GSM 900 / UMTS 2100||Former Hutchison Maxtouch / Orange / Hutch / Vodafone India
+404||22||Vodafone Idea||Maharashtra & Goa||Operational||GSM 900||former IDEA
+404||24||Vodafone Idea||Gujarat||Operational||GSM 900||former IDEA
+404||27||Vodafone Idea||Maharashtra & Goa||Operational||GSM 900||former Vodafone India
+404||30||Vodafone Idea||West Bengal||Operational||GSM 900 / GSM 1800||former Vodafone India Command / Hutch
+404||31||Airtel||West Bengal||Operational||GSM 900||
+404||34||Cellone||Haryana||Operational||GSM 900 / UMTS 2100||
+404||38||Cellone||Assam||Operational||GSM 900 / UMTS 2100||
+404||40||Airtel||Tamil Nadu||Operational||Unknown||
+404||43||Vodafone Idea||Tamil Nadu||Operational||GSM 900||former Vodafone India
+404||44||Vodafone Idea||Karnataka||Operational||GSM 900 / LTE 1800||Former Spice IDEA
+404||45||Airtel||Karnataka||Operational||GSM / TD-LTE 2300||
+404||46||Vodafone Idea||Kerala||Operational||GSM 900||former Vodafone India
+404||49||Airtel||Andhra Pradesh and Telangana||Operational||GSM 900||
+404||51||Cellone||Himachal Pradesh||Operational||GSM 900 / UMTS 2100||
+404||53||Cellone||Punjab||Operational||GSM 900 / UMTS 2100||
+404||54||Cellone||Uttar Pradesh (West) & Uttarakhand||Operational||GSM 900 / UTMS 2100||
+404||55||Cellone||Uttar Pradesh (East)||Operational||GSM 900 / UTMS 2100||
+404||56||Vodafone Idea||Uttar Pradesh (West) & Uttarakhand||Operational||GSM 900||former IDEA
+404||57||Cellone||Gujarat||Operational||GSM 900 / UMTS 2100||
+404||58||Cellone||Madhya Pradesh & Chhattisgarh||Operational||GSM 900 / UMTS 2100||
+404||59||Cellone||Rajasthan||Operational||GSM 900 / UMTS 2100||
+404||60||Vodafone Idea||Rajasthan||Operational||GSM 900||former Vodafone India
+404||62||Cellone||Jammu & Kashmir||Operational||GSM 900 / UMTS 2100||
+404||64||Cellone||Tamil Nadu||Operational||GSM 900 / UMTS 2100||
+404||66||Cellone||Maharashtra & Goa||Operational||GSM 900 / UMTS 2100||
+404||68||DOLPHIN||Delhi & NCR||Operational||GSM 900 / UMTS 2100||
+404||69||DOLPHIN||Mumbai||Operational||GSM 900 / UMTS 2100||
+404||70||Airtel||Rajasthan||Operational||Unknown||
+404||71||Cellone||Karnataka (Bangalore)||Operational||GSM 900 / UMTS 2100||
+404||72||Cellone||Kerala||Operational||GSM 900 / UMTS 2100||
+404||73||Cellone||Andhra Pradesh and Telangana||Operational||GSM 900 / UMTS 2100||
+404||74||Cellone||West Bengal||Operational||GSM 900 / UMTS 2100||
+404||75||Cellone||Bihar||Operational||GSM 900 / UMTS 2100||
+404||76||Cellone||Orissa||Operational||GSM 900 / UMTS 2100||
+404||77||Cellone||North East||Operational||GSM 900 / UMTS 2100||
+404||78||Vodafone Idea||Madhya Pradesh & Chhattisgarh||Operational||GSM 900 / UMTS 2100||former IDEA
+404||79||Cellone||Andaman Nicobar||Operational||GSM 900 / UMTS 2100||
+404||80||Cellone||Tamil Nadu||Operational||GSM 900 / UMTS 2100||
+404||81||Cellone||West Bengal||Operational||GSM 900 / UMTS 2100||
+404||82||Vodafone Idea||Himachal Pradesh||Operational||unknown||former IDEA[citation needed]
+404||84||Vodafone Idea||Tamil Nadu||Operational||GSM 1800||former Vodafone India
+404||86||Vodafone Idea||Karnataka||Operational||GSM 900 / UMTS 2100 / LTE 1800||former Vodafone India
+404||87||Vodafone Idea||Rajasthan||Operational||unknown||former IDEA
+404||88||Vodafone Idea||Vodafone Punjab||Operational||unknown||former Vodafone India[citation needed]
+404||89||Vodafone Idea||Uttar Pradesh (East)||Operational||Unknown||former IDEA
+404||90||Airtel||Maharashtra & Goa||Operational||GSM 1800||
+404||92||Airtel||Mumbai||Operational||GSM 1800 / UMTS 2100||
+404||93||Airtel||Madhya Pradesh & Chhattisgarh||Operational||GSM 1800||
+404||94||Airtel||Tamil Nadu||Operational||Unknown||
+404||95||Airtel||Kerala||Operational||GSM 1800||
+404||96||Airtel||Haryana||Operational||GSM 1800||
+404||97||Airtel||Uttar Pradesh (West) & Uttarakhand||Operational||Unknown||
+404||98||Airtel||Gujarat||Operational||Unknown||
+405||51||Airtel||West Bengal||Operational||GSM 900||
+405||52||Airtel||Bihar & Jharkhand||Operational||GSM 900||
+405||53||Airtel||Orissa||Operational||GSM||
+405||54||Airtel||Uttar Pradesh (East)||Operational||GSM 900||
+405||55||Airtel||Jammu & Kashmir||Operational||GSM 900 / UTMS 2100||
+405||56||Airtel||Assam||Operational||GSM 900 / GSM 1800||
+405||66||Vodafone Idea||Uttar Pradesh (West) & Uttarakhand||Operational||GSM 900 / GSM 1800||former Vodafone India
+405||67||Vodafone Idea||West Bengal||Operational||Unknown||former Vodafone India
+405||70||Vodafone Idea||Bihar & Jharkhand||Operational||GSM 1800||former IDEA
+405||750||Vodafone Idea||Jammu & Kashmir||Operational||Unknown||former Vodafone India
+405||751||Vodafone Idea||Assam||Operational||GSM 1800||former Vodafone India
+405||752||Vodafone Idea||Bihar & Jharkhand||Operational||GSM 1800||former Vodafone India
+405||753||Vodafone Idea||Orissa||Operational||GSM 1800||former Vodafone India
+405||754||Vodafone Idea||Himachal Pradesh||Operational||GSM 1800||former Vodafone India
+405||755||Vodafone Idea||North East||Operational||GSM 1800||former Vodafone India
+405||756||Vodafone Idea||Madhya Pradesh & Chhattisgarh||Operational||GSM 1800||former Vodafone India
+405||799||Vodafone Idea||Mumbai||Operational||GSM 900 / GSM 1800||former IDEA
+405||840||Jio||West Bengal||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||845||Vodafone Idea||Assam||Operational||GSM 1800||former IDEA
+405||846||Vodafone Idea||Jammu & Kashmir||Operational||GSM 1800 / UTMS 2100||former IDEA
+405||847||Vodafone Idea||Karnataka||Operational||GSM 1800||former IDEA
+405||848||Vodafone Idea||West Bengal||Operational||GSM 1800||former IDEA
+405||849||Vodafone Idea||North East||Operational||GSM 1800||former IDEA
+405||850||Vodafone Idea||Orissa||Operational||GSM 1800||former IDEA
+405||851||Vodafone Idea||Punjab||Operational||GSM 1800||former IDEA
+405||852||Vodafone Idea||Tamil Nadu||Operational||GSM 1800||former IDEA
+405||853||Vodafone Idea||West Bengal||Operational||GSM 1800||former IDEA
+405||854||Jio||Andhra Pradesh||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||855||Jio||Assam||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||856||Jio||Bihar||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||857||Jio||Gujarat||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||858||Jio||Haryana||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||859||Jio||Himachal Pradesh||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||860||Jio||Jammu & Kashmir||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||861||Jio||Karnataka||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||862||Jio||Kerala||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||863||Jio||Madhya Pradesh & Chhattisgarh||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||864||Jio||Maharashtra & Goa||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||865||Jio||North East||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||866||Jio||Orissa||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||867||Jio||Punjab||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||868||Jio||Rajasthan||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||869||Jio||Tamil Nadu||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||870||Jio||Uttar Pradesh (West) & Uttarakhand||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||871||Jio||Uttar Pradesh (East)||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||872||Jio||Delhi & NCR||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||873||Jio||West Bengal||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||874||Jio||Mumbai||Operational||LTE 850 / LTE 1800 / TD-LTE 2300||
+405||908||Vodafone Idea||Andhra Pradesh and Telangana||Operational||GSM 1800||former IDEA
+405||909||Vodafone Idea||Delhi & NCR||Operational||GSM 1800||former IDEA
+405||910||Vodafone Idea||Haryana||Operational||GSM 1800||former IDEA
+405||911||Vodafone Idea||Maharashtra & Goa||Operational||GSM 1800||former IDEA

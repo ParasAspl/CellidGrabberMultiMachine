@@ -1,0 +1,16 @@
+Response
+[+QSCAN: "LTE",<MCC>,<MNC>,<freq>,<PCI>,<RSRP>,<RS
+RQ>,<srxlev>,<squal>[,<cellID>,<TAC>]
+…]
+[+QSCAN: "NR5G",<MCC>,<MNC>,<freq>,<PCI>,<RSRP>,<R
+SRQ>,<srxlev>,<scs>[,<cellID>,<TAC>,<bandwidth>,<band>]
+…]
+O
+
+
++QSCAN: "LTE",404,70,3586,403,-130,-16,-5,19,DD76C17,2F8,25,8
+ "LTE",<MCC>,<MNC>,<freq>,<PCI>,<RSRP>,<RS
+RQ>,<srxlev>,<squal>[,<cellID>,<TAC>]
+
+Mcc = 404
+mnc=70
