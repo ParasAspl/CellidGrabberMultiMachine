@@ -539,6 +539,7 @@ namespace GodSharpDemo
                 // this.btnDisconnect.Click += new System.EventHandler(this.btnDisconnect_Click);
                 btnStop.Visible = false;
                 btnSave.Enabled = true;
+                btnSave.Visible = true;
                 btnStart.Visible = true;
                 DdlMode.Enabled = true;
                 metroComboBox1.Enabled = true;

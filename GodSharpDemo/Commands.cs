@@ -1549,13 +1549,17 @@ namespace CligenceCellIDGrabber
 
         private void btnStop_Click(object sender, EventArgs e)
         {
+            progressbar(0);
             if (selectedMode.ToString().ToLower() == "route")
             {
                 try
                 {
-                    lockk = false; serialPort2.Close(); Thread.Sleep(3000);
+                    lockk = false; serialPort2.Close();// Thread.Sleep(3000);
+                    Thread.Sleep(1000);
                     serialPort2.Open();
-                    Thread.Sleep(3000);
+                    //change 310324
+                   // Thread.Sleep(3000);
+                    Thread.Sleep(1000);
                     loader.Visible = false;
                     btnStop.Visible = false;
                     btnSave.Visible = true;
@@ -2080,7 +2084,7 @@ namespace CligenceCellIDGrabber
                    
                     if (a.Contains("5G") && !a.Contains("4G + 5G"))
                     {
-                        progressbar(19);
+                        progressbar(25);
                         scan5GNetwork(Countok);
 
                         if (Countok >= 5 && !selectedMode.ToLower().Contains("route"))
@@ -2887,7 +2891,7 @@ namespace CligenceCellIDGrabber
         {
             try
             {
-               // progressBar1.Value = e.ProgressPercentage;
+               this. Progrsbr.Value = e.ProgressPercentage;
             }
             catch (Exception ex)
             { }
@@ -2990,7 +2994,6 @@ namespace CligenceCellIDGrabber
                 cmbMode.Enabled = true;
             }
         }
-
         private void cmbMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             List<TypeText> TypeList = new List<TypeText>();
