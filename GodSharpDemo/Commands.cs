@@ -48,7 +48,7 @@ namespace CligenceCellIDGrabber
         bool MachineType;
         string selectedcmbMode;
         int Countok = 0;
-        System.Management.ManagementEventWatcher watcher = new System.Management.ManagementEventWatcher();
+        System.Management.ManagementEventWatcher watcher ;
         public Commands()
         {
 
@@ -176,12 +176,13 @@ namespace CligenceCellIDGrabber
             //watcher.Start();
 
             // Create a WMI query to monitor for USB device arrival and removal events
-            WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2 OR EventType = 3");
+           // WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2 OR EventType = 3");
 
             // Create a management event watcher to listen for events
-            ManagementEventWatcher watcher = new ManagementEventWatcher(query);
-            watcher.EventArrived += USBDeviceChangeHandler;
-            watcher.Start();
+           //  watcher = new ManagementEventWatcher(query);
+           // ManagementEventWatcher watcher = new ManagementEventWatcher(query);
+           // watcher.EventArrived += USBDeviceChangeHandler;
+          //  watcher.Start();
             // Keep the program running
             //Console.WriteLine("Listening for COM port changes. Press any key to exit...");
             //Console.ReadKey();
@@ -327,6 +328,11 @@ namespace CligenceCellIDGrabber
             string c3 = (@"AT+QENG=""servingcell""").Replace("\r", "").Replace("\n", "");
             if ((selectedcmbMode) == "Fast")
             {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
                 if (Countok < 1)
                 {
                     serialWrite(c1); Thread.Sleep(2000);
@@ -720,6 +726,11 @@ namespace CligenceCellIDGrabber
         {
             try
             {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
                 net = "3G";
                 string s = "\"blabla\"";
                 len = 11;
@@ -760,6 +771,11 @@ namespace CligenceCellIDGrabber
         {
             try
             {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
                 net = "4G";
                 len = 15;
                 //outputFile = @"C:\amar\2goutput.txt";
@@ -928,6 +944,11 @@ namespace CligenceCellIDGrabber
         {
             try
             {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
                 //string f = @"Joe said ""Hello"" to me";
                 net = "5G";
                 string s = "\"blabla\"";
@@ -1188,6 +1209,11 @@ namespace CligenceCellIDGrabber
         {
             try
             {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
                 net = "4G + 5G";
                 len = 15;
                 string c1 = ("AT+QSCAN=2,1").
@@ -1232,6 +1258,11 @@ namespace CligenceCellIDGrabber
                 }
                 else
                 {
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected.Scan will stop");
+                        return;
+                    }
                     if (Countok < 1)
                     {
                         serialWrite(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71");
@@ -1567,7 +1598,7 @@ namespace CligenceCellIDGrabber
         private void btnStop_Click(object sender, EventArgs e)
         {
             //progressbar(0);
-            watcher.Stop();
+           // watcher.Stop();
             if (selectedMode.ToString().ToLower() == "route")
             {
                 try
