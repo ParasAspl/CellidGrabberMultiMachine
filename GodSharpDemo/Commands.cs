@@ -1794,9 +1794,9 @@ namespace CligenceCellIDGrabber
                 }
                 catch (Exception ex)
                 {
+                    MessageBox.Show(ex.Message);
                     //port = new SerialPort(ports[1]);
                     //port.Open();
-
                 }
 
                 //SerialPort port4 = new SerialPort(ports[4]);
@@ -1804,8 +1804,6 @@ namespace CligenceCellIDGrabber
                 ////SerialPort port = new SerialPort(ports[0], 115200);
                 //port4.BaudRate = 115200; port4.DataBits = 8; port4.Parity = Parity.None; port4.StopBits = StopBits.One; port4.Handshake = Handshake.None;
                 //port4.DtrEnable = true; port4.NewLine = Environment.NewLine; port4.ReceivedBytesThreshold = 1024; port4.Open();
-
-
                 // }
                 //port.DataReceived += new SerialDataReceivedEventHandler(serialPort2_DataReceived);
 
@@ -1816,13 +1814,15 @@ namespace CligenceCellIDGrabber
                 }
                 catch (Exception ex)
                 {
-
+                    MessageBox.Show(ex.Message);
+                    return false;
                 }
 
                 return true;
             }
             catch (Exception e)
             {
+                MessageBox.Show(e.Message);
                 // SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
                 return false;
                 // throw e;
