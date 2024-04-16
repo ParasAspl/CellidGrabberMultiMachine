@@ -139,9 +139,7 @@ namespace CligenceCellIDGrabber
                     startinfo.FileName = "cmd.exe";
                 }
                 catch (Exception ex)
-                {
-
-                }
+                {}
                 // string newStr = "\"" + "AT Port" + "\"";
                 // string s = @"/c wmic path win32_pnpentity get caption /format:table |find ""AT Port""";
                 // newStr = "/c wmic path win32_pnpentity get caption /format:table |find " + newStr;
@@ -149,7 +147,6 @@ namespace CligenceCellIDGrabber
                 //startinfo.Arguments = String.Concat("/c wmic path win32_pnpentity get caption /format:table |find ", "\"", "AT Port");
                 //string txt = (@"""Add doublequotes""").Replace("\\", ""); 
                 startinfo.Arguments = "/c wmic path win32_pnpentity get caption /format:table  <NUL";
-
                 process.StartInfo = startinfo;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardInput = true;

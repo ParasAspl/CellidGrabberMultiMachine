@@ -14,6 +14,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Management;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
@@ -47,11 +48,12 @@ namespace CligenceCellIDGrabber
         bool MachineType;
         string selectedcmbMode;
         int Countok = 0;
-
+        System.Management.ManagementEventWatcher watcher = new System.Management.ManagementEventWatcher();
         public Commands()
         {
 
             InitializeComponent();
+
             (new DropShadow()).ApplyShadows(this);
             btnConnect.Visible = true;
             btnDisconnect.Visible = false;
@@ -169,6 +171,21 @@ namespace CligenceCellIDGrabber
         private void btnStart_Click(object sender, EventArgs e)
         {
             Countok = 0;
+            //watcher.EventArrived += new System.Management.EventArrivedEventHandler(PortAddedOrRemoved);
+            //watcher.Query = new System.Management.WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2 OR EventType = 3");
+            //watcher.Start();
+
+            // Create a WMI query to monitor for USB device arrival and removal events
+            WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2 OR EventType = 3");
+
+            // Create a management event watcher to listen for events
+            ManagementEventWatcher watcher = new ManagementEventWatcher(query);
+            watcher.EventArrived += USBDeviceChangeHandler;
+            watcher.Start();
+            // Keep the program running
+            //Console.WriteLine("Listening for COM port changes. Press any key to exit...");
+            //Console.ReadKey();
+            // Clean up
 
             //System.Reflection.Assembly executingAssembly = System.Reflection.Assembly.GetExecutingAssembly();
             //var fieVersionInfo = FileVersionInfo.GetVersionInfo(executingAssembly.Location);
@@ -1549,16 +1566,18 @@ namespace CligenceCellIDGrabber
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            progressbar(0);
+            //progressbar(0);
+            watcher.Stop();
             if (selectedMode.ToString().ToLower() == "route")
             {
                 try
                 {
                     lockk = false; serialPort2.Close();// Thread.Sleep(3000);
                     Thread.Sleep(1000);
-                    serialPort2.Open();
+                   // serialPort2.Close();
+                    //serialPort2.Open();
                     //change 310324
-                   // Thread.Sleep(3000);
+                    // Thread.Sleep(3000);
                     Thread.Sleep(1000);
                     loader.Visible = false;
                     btnStop.Visible = false;
@@ -1811,7 +1830,7 @@ namespace CligenceCellIDGrabber
             {
                 loader.Visible = true;
             });
-
+            
             btnStart.Invoke((MethodInvoker)delegate
             {
                 btnStart.Enabled = true;
@@ -1960,14 +1979,15 @@ namespace CligenceCellIDGrabber
 
                         if (Countok > 68)
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
+                            MessageBox.Show("Scan Completed");
 
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -1984,14 +2004,15 @@ namespace CligenceCellIDGrabber
                         progressbar(3);
                         if (Countok > 38)
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
+                            MessageBox.Show("Scan Completed");
                             // serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
@@ -2007,15 +2028,15 @@ namespace CligenceCellIDGrabber
                         progressbar(1);
                         if (Countok > 103)
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
-
+                            MessageBox.Show("Scan Completed");
 
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -2032,14 +2053,15 @@ namespace CligenceCellIDGrabber
                         scan3GNetwork(Countok);
                         if (Countok >= 6)
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
+                            MessageBox.Show("Scan Completed");
                             //MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -2056,14 +2078,15 @@ namespace CligenceCellIDGrabber
                         scanAllForFast(Countok);
                         if (Countok >= 105)
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
+                            MessageBox.Show("Scan Completed");
                             //MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -2089,14 +2112,15 @@ namespace CligenceCellIDGrabber
 
                         if (Countok >= 5 && !selectedMode.ToLower().Contains("route"))
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
+                            MessageBox.Show("Scan Completed");
                             //MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -2115,14 +2139,15 @@ namespace CligenceCellIDGrabber
 
                         if (Countok >= 5 && !selectedMode.ToLower().Contains("route"))
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
+                            MessageBox.Show("Scan Completed");
                             // MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -2140,15 +2165,15 @@ namespace CligenceCellIDGrabber
 
                         if (Countok >= 9 && !selectedMode.ToLower().Contains("route"))
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
-                            // MessageBox.Show("Scan Completed");
+                            MessageBox.Show("Scan Completed");
                             // serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
@@ -2164,14 +2189,15 @@ namespace CligenceCellIDGrabber
                         scan3GNetwork(Countok);
                         if (Countok > 3 && !selectedMode.ToLower().Contains("route"))
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
+                            MessageBox.Show("Scan Completed");
                             // MessageBox.Show("Scan Completed");
                             // serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -2188,15 +2214,15 @@ namespace CligenceCellIDGrabber
                         scanAllForFast(Countok);
                         if (Countok > 12 && !selectedMode.ToLower().Contains("route"))
                         {
-                            if (this.loader.Visible)
-                            {
-                                MessageBox.Show("Scan Completed");
-                            }
+                            //if (this.loader.Visible)
+                            //{
+                            //    MessageBox.Show("Scan Completed");
+                            //}
                             loader.Invoke((MethodInvoker)delegate
                             {
                                 loader.Visible = false;
                             });
-                            // MessageBox.Show("Scan Completed");
+                            MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
@@ -3169,8 +3195,6 @@ namespace CligenceCellIDGrabber
             return File.Exists(file);
         }
 
-
-
         [STAThread]
         public void Export2Excel(DataTable dt, string fileName)
         {
@@ -3217,6 +3241,13 @@ namespace CligenceCellIDGrabber
                 scannedCellId.Clear();
                 //metroGrid1.Rows.Clear();
                 metroGrid1.DataSource = null;
+                Progrsbr.Invoke((MethodInvoker)delegate
+                {
+                   // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                  
+                    Progrsbr.Value = 0;
+                    
+                });
                 //  metroComboBox1.Enabled = false;
             }
             else
@@ -3234,6 +3265,77 @@ namespace CligenceCellIDGrabber
             var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
         }
+        #region SerialportTask
+        static void USBDeviceChangeHandler(object sender, EventArrivedEventArgs e)
+        {
+            int eventType = int.Parse(e.NewEvent.GetPropertyValue("EventType").ToString());
+            ManagementBaseObject targetInstance = (ManagementBaseObject)e.NewEvent.GetPropertyValue("TargetInstance");
+
+            if (eventType == 2) // Device removed
+            {
+                string deviceName = targetInstance["Name"].ToString();
+                MessageBox.Show($"Device {deviceName} removed.");
+                // Add your logic here for handling device removal
+            }
+            else if (eventType == 3) // Device inserted
+            {
+                string deviceName = targetInstance["Name"].ToString();
+                MessageBox.Show($"Device {deviceName} inserted.");
+                // Add your logic here for handling device insertion
+            }
+        }
+        static void PortAddedOrRemovedc(object sender, System.Management.EventArrivedEventArgs e)
+        {
+            // Check if a COM port was added or removed
+            if ((uint)e.NewEvent.GetPropertyValue("EventType") == 2) // COM port removed
+            {
+                string portName = e.NewEvent.GetPropertyValue("InstanceName").ToString();
+                MessageBox.Show($"COM port {portName} removed.");
+               // Console.WriteLine($"COM port {portName} removed.");
+                // Here you can add your logic to handle the removal of the GSM chip
+            }
+            else if ((uint)e.NewEvent.GetPropertyValue("EventType") == 3) // COM port added
+            {
+                string portName = e.NewEvent.GetPropertyValue("InstanceName").ToString();
+                MessageBox.Show($"COM port { portName}added.");
+             //  Console.WriteLine($"COM port {portName} added.");
+                // Here you can add your logic to handle the addition of the GSM chip
+            }
+        }
+
+        public void  PortAddedOrRemoved(object sender, System.Management.EventArrivedEventArgs e)
+        {
+            // Check if a COM port was added or removed
+            if ((uint)e.NewEvent.GetPropertyValue("EventType") == 2) // COM port removed
+            {
+                string portName = e.NewEvent.GetPropertyValue("InstanceName").ToString();
+               // Console.WriteLine($"COM port {portName} removed.");
+                MessageBox.Show($"COM port { portName} removed.");
+                if (serialPort2  != null && serialPort2.PortName == portName)
+                {
+                    serialPort2.Close();
+                    serialPort2 = null;
+                    // Console.WriteLine("Disconnected from previous port.");
+                    MessageBox.Show("Disconnected from previous port.");
+                }
+            }
+            else if ((uint)e.NewEvent.GetPropertyValue("EventType") == 3) // COM port added
+            {
+                string portName = e.NewEvent.GetPropertyValue("InstanceName").ToString();
+                // Console.WriteLine($"COM port {portName} added.");
+                MessageBox.Show($"COM port { portName}added.");
+                if (serialPort2 == null)
+                {
+                    serialPort2 = new SerialPort(portName);
+                    serialPort2.Open();
+                    //Console.WriteLine("Connected to new port.");
+                    MessageBox.Show("Connected to new port.");
+                    // Here you can resume normal operation or perform any initialization
+                }
+            }
+        }
+
+        #endregion
     }
 
 }
