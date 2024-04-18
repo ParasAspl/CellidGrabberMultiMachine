@@ -48,7 +48,7 @@ namespace CligenceCellIDGrabber
         bool MachineType;
         string selectedcmbMode;
         int Countok = 0;
-        System.Management.ManagementEventWatcher watcher ;
+        System.Management.ManagementEventWatcher watcher;
         public Commands()
         {
 
@@ -57,13 +57,13 @@ namespace CligenceCellIDGrabber
             (new DropShadow()).ApplyShadows(this);
             btnConnect.Visible = true;
             btnDisconnect.Visible = false;
-            lblmsg.Text = MNC_MCC.Message.Replace("Name", "").Replace(":","");
+            lblmsg.Text = MNC_MCC.Message.Replace("Name", "").Replace(":", "");
             //lblApplicationVersion.Text = "Version : 1.00";
             if (System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed)
             {
                 Version ver = System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion;
                 lblApplicationVersion.Text = string.Format("Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Assembly.GetEntryAssembly().GetName().Name);
-               // lblApplicationVersion.Text = string.Format("Product Name: {4}, Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Assembly.GetEntryAssembly().GetName().Name);
+                // lblApplicationVersion.Text = string.Format("Product Name: {4}, Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Assembly.GetEntryAssembly().GetName().Name);
             }
             else
             {
@@ -84,15 +84,19 @@ namespace CligenceCellIDGrabber
             //DdlMode.SelectedText = "Spot";
             //cmbMode.SelectedIndex = 1;
             port = srport();
+
             try
             {
                 serialPort2.Close();
+                serialPort2.Open();
             }
             catch (Exception ex)
             {
 
             }
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
 
+            Task timerTask = RunPeriodically(Checkport, TimeSpan.FromSeconds(15), tokenSource.Token);
             // String mccMnc = File.ReadAllText("mcc-mnc.txt");
             string mccMnc = MNC_MCC.GetMCCMNC;
             oneD = mccMnc.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
@@ -136,8 +140,97 @@ namespace CligenceCellIDGrabber
             //  metroGrid1.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgv_RowPostPaint);
 
         }
+        async Task RunPeriodically(Action action, TimeSpan interval, CancellationToken token)
+        {
+            while (true)
+            {
+                action();
+                await Task.Delay(interval, token);
+            }
+        }
+        public void Checkport()
+        {
 
-        
+            if (serialPort2 != null && !serialPort2.IsOpen && this.loader.Visible)
+            {
+                try
+                {
+                    serialPort2.Close();
+                }
+                catch (Exception ex)
+                { }
+                MessageBox.Show("Device's Cable is not connected.");
+                btnDisconnect.Visible = false;
+                loader.Invoke((MethodInvoker)delegate
+                {
+                    loader.Visible = false;
+                });
+
+                btnConnect.Visible = true;
+                cmbMode.Enabled = false;
+                metroComboBox1.Enabled = false;
+                DdlMode.Enabled = false;
+                btnStop.Visible = false;
+                btnStart.Visible = true;
+                btnStart.Enabled = false;
+                btnConnect.Enabled = false;
+                try
+                {
+                    try
+                    {
+                        serialPort2.Close();
+                    }
+                    catch (Exception ex) { }
+                    // scannedCellId.Clear();
+                    //  dt.Clear();
+                    lblStatus.Text = "Status : Disconnected";
+                    MessageBox.Show("Connection closed!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error while closing connection" + ex);
+                    throw;
+                }
+
+                return;
+            }
+            else
+            {
+                try
+                {
+                    //if (serialPort2 == null)
+                    //{
+                    //    port = srport();
+                    //}
+                    if (!serialPort2.IsOpen && this.btnStart.Visible)
+                    {
+                        port = srport();
+                        Thread.Sleep(3000);
+                        bool status = establishConnection();
+                        if (status)
+                        {
+                            if (region == "NA")
+                            {
+                                regionloader.RunWorkerAsync();
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        btnConnect.Visible = true;
+                        // MessageBox.Show("Cable is connected.");
+                        btnConnect.Enabled = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+        }
+
         private string hexToInteger(string ascii)
         {
             try
@@ -153,7 +246,7 @@ namespace CligenceCellIDGrabber
         private void Dashboard5G_Load(object sender, EventArgs e)
         {
             //string constring = @"Data Source=DESKTOP-181DVKB;Initial Catalog=A6EAFEBFD8C8DC87FBFF637565326404187726;Integrated Security=true";
-        
+
             //using (SqlConnection con = new SqlConnection(constring))
             //{
             //    SqlCommand cmd = new SqlCommand("AAGetCustomersPageWise", con);
@@ -171,18 +264,35 @@ namespace CligenceCellIDGrabber
         private void btnStart_Click(object sender, EventArgs e)
         {
             Countok = 0;
+            try
+            {
+                serialPort2.DataReceived += serialPort2_DataReceived;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            loader.Invoke((MethodInvoker)delegate
+            {
+                loader.Visible = true;
+            });
+
+            //btnStart.Invoke((MethodInvoker)delegate
+            //{
+            //    btnStart.Enabled = true;
+            //});
             //watcher.EventArrived += new System.Management.EventArrivedEventHandler(PortAddedOrRemoved);
             //watcher.Query = new System.Management.WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2 OR EventType = 3");
             //watcher.Start();
 
             // Create a WMI query to monitor for USB device arrival and removal events
-           // WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2 OR EventType = 3");
+            // WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2 OR EventType = 3");
 
             // Create a management event watcher to listen for events
-           //  watcher = new ManagementEventWatcher(query);
-           // ManagementEventWatcher watcher = new ManagementEventWatcher(query);
-           // watcher.EventArrived += USBDeviceChangeHandler;
-          //  watcher.Start();
+            //  watcher = new ManagementEventWatcher(query);
+            // ManagementEventWatcher watcher = new ManagementEventWatcher(query);
+            // watcher.EventArrived += USBDeviceChangeHandler;
+            //  watcher.Start();
             // Keep the program running
             //Console.WriteLine("Listening for COM port changes. Press any key to exit...");
             //Console.ReadKey();
@@ -297,7 +407,7 @@ namespace CligenceCellIDGrabber
                         {
                             btnStop.Visible = false;
                             btnSave.Visible = false;
-                            btnStart.Visible = true;
+                            btnStart.Visible = false;
                             MessageBox.Show("Please connect machine first.");
                         }
                     }
@@ -716,8 +826,6 @@ namespace CligenceCellIDGrabber
                     serialWrite(c33);
                     Thread.Sleep(2000);
                 }
-
-
             }
         }
 
@@ -1598,14 +1706,14 @@ namespace CligenceCellIDGrabber
         private void btnStop_Click(object sender, EventArgs e)
         {
             //progressbar(0);
-           // watcher.Stop();
+            // watcher.Stop();
             if (selectedMode.ToString().ToLower() == "route")
             {
                 try
                 {
                     lockk = false; serialPort2.Close();// Thread.Sleep(3000);
                     Thread.Sleep(1000);
-                   // serialPort2.Close();
+                    // serialPort2.Close();
                     //serialPort2.Open();
                     //change 310324
                     // Thread.Sleep(3000);
@@ -1764,12 +1872,34 @@ namespace CligenceCellIDGrabber
                             //MessageBox.Show("Region Selected");                    
                         }
                     }
-                    //else
-                    //{
-                    //    MessageBox.Show("In Progress.");
-                    //}
-
                 }
+                else if (serialPort2.IsOpen)
+                {
+                    bool status = establishConnection();
+                    lblStatus.Text = "Status : Connected";
+                    DdlMode.Enabled = true;
+                    btnSave.Visible = false;
+                    btnDisconnect.Visible = true;
+                    btnStart.Enabled = true;
+                    if (region == "NA")
+                    {
+                        //loader.Visible = true;
+                        btnConnect.Visible = false;
+                        btnStart.Enabled = true;
+                        cmbMode.Enabled = true;
+                        metroComboBox1.Enabled = true;
+                        DdlMode.Enabled = true;
+                        regionloader.RunWorkerAsync();
+                        //MessageBox.Show("Region Selected");                    
+                    }
+                }
+
+                //else
+                //{
+                //    MessageBox.Show("In Progress.");
+                //}
+
+
             }
             catch (Exception ex)
             {
@@ -1783,20 +1913,29 @@ namespace CligenceCellIDGrabber
         {
             try
             {
+                serialPort2.DtrEnable = true;
+                serialPort2.RtsEnable = true;
                 string[] ports = SerialPort.GetPortNames();
                 //for (int h = 0; h < ports.Length; h++)
                 //{
-                SerialPort port = new SerialPort(ports[0]);
-
                 try
                 {
+                    SerialPort port = new SerialPort(ports[0].Trim(), 115200, Parity.None, 8, StopBits.One);
+                    //SerialPort port = new SerialPort(ports[0]);
+                    //if (serialPort2.PortName.Trim() == port.PortName.Trim())
+                    //{
+                    //     port = new SerialPort(ports[1]);
+                    //}
+                    port.DtrEnable = true;
+                    port.RtsEnable = true;
+                    Thread.Sleep(2000);
                     port.Open();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
                     //port = new SerialPort(ports[1]);
                     //port.Open();
+
                 }
 
                 //SerialPort port4 = new SerialPort(ports[4]);
@@ -1804,25 +1943,50 @@ namespace CligenceCellIDGrabber
                 ////SerialPort port = new SerialPort(ports[0], 115200);
                 //port4.BaudRate = 115200; port4.DataBits = 8; port4.Parity = Parity.None; port4.StopBits = StopBits.One; port4.Handshake = Handshake.None;
                 //port4.DtrEnable = true; port4.NewLine = Environment.NewLine; port4.ReceivedBytesThreshold = 1024; port4.Open();
+
+
                 // }
                 //port.DataReceived += new SerialDataReceivedEventHandler(serialPort2_DataReceived);
 
                 //port.ReadTimeout = 500;
                 try
                 {
+                    serialPort2.Close();
+                   // serialPort2.Dispose();
+                    Thread.Sleep(2000);
                     serialPort2.Open();
+                    Thread.Sleep(2000);
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // Handle unauthorized access exception
+                    Console.WriteLine("Unauthorized access: " + ex.Message);
+                }
+                catch (IOException ex)
+                {
+                    // Handle other I/O exceptions
+                    Console.WriteLine("I/O error: " + ex.Message);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
-                    return false;
+                    //MessageBox.Show(ex.Message);
+                    //if (serialPort2 != null)
+                    //{
+                    //  serialPort2.Dispose();
+                    //    serialPort2 = null;
+                    //}
                 }
-
+                //if (!serialPort2.IsOpen)
+                //{
+                //    return false;
+                //}
+                //else
+                //{
                 return true;
+                ///}
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
                 // SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
                 return false;
                 // throw e;
@@ -1830,6 +1994,7 @@ namespace CligenceCellIDGrabber
             finally
             {
                 MessageBox.Show(serialPort2.IsOpen ? "Successfully connected" : "Not connected");
+
             }
 
         }
@@ -1857,15 +2022,15 @@ namespace CligenceCellIDGrabber
             }
             //string[] array1 = dataRec.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             //List<Dictionary<string, string>> list1 = clean(array1);
-            loader.Invoke((MethodInvoker)delegate
-            {
-                loader.Visible = true;
-            });
-            
-            btnStart.Invoke((MethodInvoker)delegate
-            {
-                btnStart.Enabled = true;
-            });
+            //loader.Invoke((MethodInvoker)delegate
+            //{
+            //    loader.Visible = true;
+            //});
+
+            //btnStart.Invoke((MethodInvoker)delegate
+            //{
+            //    btnStart.Enabled = true;
+            //});
             metroComboBox1.Invoke((MethodInvoker)delegate
             {
                 //if(DdlMode.SelectedItem.ToString()=="Route")
@@ -1882,7 +2047,7 @@ namespace CligenceCellIDGrabber
                 cmbMode.Enabled = true;
             });//
                //}
-            //(net != "R") && result >= 5 || 
+               //(net != "R") && result >= 5 || 
 
             string[] array = dataRec.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             List<Dictionary<string, string>> list = clean(array);
@@ -2135,7 +2300,7 @@ namespace CligenceCellIDGrabber
                 else if (dataRec.ToLower().Contains("ok") && (selectedMode.ToLower().Contains("spot") || selectedMode.ToLower().Contains("route"))
            && selectedcmbMode.ToLower().Contains("fast") && (dataRec.ToLower().Contains("ok") || dataRec.ToLower().Contains("error")) && (selectedMode.ToLower().Contains("spot")) || selectedMode.ToLower().Contains("route"))
                 {
-                   
+
                     if (a.Contains("5G") && !a.Contains("4G + 5G"))
                     {
                         progressbar(25);
@@ -2288,20 +2453,23 @@ namespace CligenceCellIDGrabber
 
         public void progressbar(int increment)
         {
-            Progrsbr.Invoke((MethodInvoker)delegate
+            if (this.Progrsbr.Visible)
             {
-                this.Progrsbr.Increment(increment);
-                int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) /
-                    (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
-                using (Graphics graphics = Progrsbr.CreateGraphics())
+                Progrsbr.Invoke((MethodInvoker)delegate
                 {
-                    graphics.DrawString(per.ToString() + "%", SystemFonts.DefaultFont, Brushes.Black,
-                        new PointF(Progrsbr.Width / 2 - (graphics.MeasureString(per.ToString() + "%",
-                        SystemFonts.DefaultFont).Width / 2.0F),
-                        Progrsbr.Height / 2 - (graphics.MeasureString(per.ToString() + "%",
-                        SystemFonts.DefaultFont).Height / 2.0F)));
-                }
-            });
+                    this.Progrsbr.Increment(increment);
+                    int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) /
+                        (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                    using (Graphics graphics = Progrsbr.CreateGraphics())
+                    {
+                        graphics.DrawString(per.ToString() + "%", SystemFonts.DefaultFont, Brushes.Black,
+                            new PointF(Progrsbr.Width / 2 - (graphics.MeasureString(per.ToString() + "%",
+                            SystemFonts.DefaultFont).Width / 2.0F),
+                            Progrsbr.Height / 2 - (graphics.MeasureString(per.ToString() + "%",
+                            SystemFonts.DefaultFont).Height / 2.0F)));
+                    }
+                });
+            }
         }
         private void dgv_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
@@ -2948,7 +3116,7 @@ namespace CligenceCellIDGrabber
         {
             try
             {
-               this. Progrsbr.Value = e.ProgressPercentage;
+                this.Progrsbr.Value = e.ProgressPercentage;
             }
             catch (Exception ex)
             { }
@@ -2972,6 +3140,15 @@ namespace CligenceCellIDGrabber
         {
             try
             {
+                if (serialPort2 != null)
+                {
+                    if (serialPort2.IsOpen)
+                    {
+                        serialPort2.BaseStream.Dispose();
+                    }
+                    serialPort2.Dispose();
+                    //serialPort2 = null;
+                }
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startinfo = new System.Diagnostics.ProcessStartInfo();
                 startinfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
@@ -3003,7 +3180,14 @@ namespace CligenceCellIDGrabber
                     string subport = portText.Substring(portText.LastIndexOf('(') + 1, portText.LastIndexOf(')'));
                     port = subport.Replace(")", "");
 
-                    this.serialPort2.PortName = port;
+
+                    serialPort2.PortName = port.Trim();
+                    serialPort2.BaudRate = 115200;
+                    Thread.Sleep(1000);
+                    //serialPort2.Parity = Parity.None;
+                    //serialPort2.DataBits = 8;
+                    //serialPort2.StopBits = StopBits.One;
+                    serialPort2.Open();
                 }
             }
             catch (Exception ex)
@@ -3024,6 +3208,10 @@ namespace CligenceCellIDGrabber
             // wmic path win32_pnpentity get caption /format:table |find "AT Port"
             if ((selectedNetwork.Name.ToString() == "Route")) //|| (DdlMode.SelectedItem.ToString() == "Spot"))
             {
+                Progrsbr.Invoke((MethodInvoker)delegate
+                {
+                    Progrsbr.Visible = false;
+                });
                 TypeList.Add(new TypeText { Name = "Select" });
                 TypeList.Add(new TypeText { Name = "3G" });
                 TypeList.Add(new TypeText { Name = "4G" });
@@ -3038,6 +3226,10 @@ namespace CligenceCellIDGrabber
             }
             else if ((selectedNetwork.Name.ToString() == "Spot")) //|| (DdlMode.SelectedItem.ToString() == "Spot"))
             {
+                Progrsbr.Invoke((MethodInvoker)delegate
+                {
+                    Progrsbr.Visible = true;
+                });
                 TypeList.Add(new TypeText { Name = "Select" });
                 TypeList.Add(new TypeText { Name = "3G" });
                 TypeList.Add(new TypeText { Name = "4G" });
@@ -3079,7 +3271,7 @@ namespace CligenceCellIDGrabber
         {
             lblDate.Text = System.DateTime.Now.ToString();
         }
-      //  [STAThread]
+        //  [STAThread]
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (dt != null && dt.Rows.Count > 0)
@@ -3092,84 +3284,84 @@ namespace CligenceCellIDGrabber
                         //Thread t = new Thread((ThreadStart)(() =>
                         //{
 
-                            // wmic path win32_pnpentity get caption /format:table |find "AT Port"
-                            //Exporting to Excel
-                            //try
-                            //{
-                              //  var dr = sfdExcel.ShowDialog();
-                                //sfdExcel.ShowDialog();
-                                // folderPath = sfdExcel.FileName;
-                            //}
-                            //catch (Exception ex)
-                            //{
-                            //    MessageBox.Show(ex.Message.ToString());
-                            //}
-                            DataTable tblFilteredJio = new DataTable();
-                            DataTable tblFilteredAirtel = new DataTable();
-                            DataTable tblFilteredVodafoneIdea = new DataTable();
-                            DataTable tblother = new DataTable();
-                            DataTable tblAll = new DataTable();
-                            DataSet ds = new DataSet();
-                            tblAll = dt.AsEnumerable().CopyToDataTable();
-                            ds.Tables.Add(tblAll);
-                            string[] tabName = { "All", "Jio", "Airtel", "Vodafone Idea", "Other" };
-                            try
+                        // wmic path win32_pnpentity get caption /format:table |find "AT Port"
+                        //Exporting to Excel
+                        //try
+                        //{
+                        //  var dr = sfdExcel.ShowDialog();
+                        //sfdExcel.ShowDialog();
+                        // folderPath = sfdExcel.FileName;
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    MessageBox.Show(ex.Message.ToString());
+                        //}
+                        DataTable tblFilteredJio = new DataTable();
+                        DataTable tblFilteredAirtel = new DataTable();
+                        DataTable tblFilteredVodafoneIdea = new DataTable();
+                        DataTable tblother = new DataTable();
+                        DataTable tblAll = new DataTable();
+                        DataSet ds = new DataSet();
+                        tblAll = dt.AsEnumerable().CopyToDataTable();
+                        ds.Tables.Add(tblAll);
+                        string[] tabName = { "All", "Jio", "Airtel", "Vodafone Idea", "Other" };
+                        try
+                        {
+                            tblFilteredJio = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Jio").CopyToDataTable();
+                            ds.Tables.Add(tblFilteredJio);
+                        }
+                        catch (Exception ex)
+                        {
+                            ds.Tables.Add(tblFilteredJio);
+                        }
+                        try
+                        {
+                            tblFilteredAirtel = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Airtel").CopyToDataTable();
+                            ds.Tables.Add(tblFilteredAirtel);
+                        }
+                        catch (Exception ex)
+                        {
+                            ds.Tables.Add(tblFilteredAirtel);
+                        }
+                        try
+                        {
+                            tblFilteredVodafoneIdea = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Vodafone Idea").CopyToDataTable();
+                            ds.Tables.Add(tblFilteredVodafoneIdea);
+                        }
+                        catch (Exception ex)
+                        {
+                            ds.Tables.Add(tblFilteredVodafoneIdea);
+                        }
+                        try
+                        {
+                            tblother = dt.AsEnumerable()
+                                   .Where(r => r.Field<string>("Operator Name") != "Airtel")
+                                   .Where(r => r.Field<string>("Operator Name") != "Jio")
+                                   .Where(x => x.Field<string>("Operator Name") != "Vodafone Idea")
+                                   .CopyToDataTable();
+                            ds.Tables.Add(tblother);
+                        }
+                        catch (Exception ex)
+                        {
+                            ds.Tables.Add(tblother);
+                        }
+                        try
+                        {
+                            folderPath = GetfileData();
+                            using (XLWorkbook wb = new XLWorkbook())
                             {
-                                tblFilteredJio = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Jio").CopyToDataTable();
-                                ds.Tables.Add(tblFilteredJio);
-                            }
-                            catch (Exception ex)
-                            {
-                                ds.Tables.Add(tblFilteredJio);
-                            }
-                            try
-                            {
-                                tblFilteredAirtel = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Airtel").CopyToDataTable();
-                                ds.Tables.Add(tblFilteredAirtel);
-                            }
-                            catch (Exception ex)
-                            {
-                                ds.Tables.Add(tblFilteredAirtel);
-                            }
-                            try
-                            {
-                                tblFilteredVodafoneIdea = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Vodafone Idea").CopyToDataTable();
-                                ds.Tables.Add(tblFilteredVodafoneIdea);
-                            }
-                            catch (Exception ex)
-                            {
-                                ds.Tables.Add(tblFilteredVodafoneIdea);
-                            }
-                            try
-                            {
-                                tblother = dt.AsEnumerable()
-                                       .Where(r => r.Field<string>("Operator Name") != "Airtel")
-                                       .Where(r => r.Field<string>("Operator Name") != "Jio")
-                                       .Where(x => x.Field<string>("Operator Name") != "Vodafone Idea")
-                                       .CopyToDataTable();
-                                ds.Tables.Add(tblother);
-                            }
-                            catch (Exception ex)
-                            {
-                                ds.Tables.Add(tblother);
-                            }
-                            try
-                            {
-                                folderPath = GetfileData();
-                                using (XLWorkbook wb = new XLWorkbook())
+                                for (int i = 0; i < ds.Tables.Count; i++)
                                 {
-                                    for (int i = 0; i < ds.Tables.Count; i++)
-                                    {
-                                        wb.Worksheets.Add(ds.Tables[i], tabName[i].ToString());
-                                        wb.SaveAs(folderPath);
-                                    }
+                                    wb.Worksheets.Add(ds.Tables[i], tabName[i].ToString());
+                                    wb.SaveAs(folderPath);
                                 }
                             }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(ex.Message.ToString());
-                            }
-                            MessageBox.Show("File successfully saved on below Path" + Environment.NewLine + folderPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message.ToString());
+                        }
+                        MessageBox.Show("File successfully saved on below Path" + Environment.NewLine + folderPath);
                         //}));
                         System.Diagnostics.Process.Start(folderPath);
                         //// Run your code from a thread that joins the STA Thread
@@ -3193,10 +3385,10 @@ namespace CligenceCellIDGrabber
         #region MyRegion
         public string GetfileData()
         {
-           
+
             var dir = @"C:\CligenceExcel";  // folder location
-            string filepath = "C:\\CligenceExcel\\" +  DateTime.Now.ToString("yyyyMMdd_hhmmss")+ "-CligenceExcelReport"  + ".xlsx";
-          
+            string filepath = "C:\\CligenceExcel\\" + DateTime.Now.ToString("yyyyMMdd_hhmmss") + "-CligenceExcelReport" + ".xlsx";
+
             // folder location
             //  var directoryInfo = new DirectoryInfo("C:\\Sys\\");
 
@@ -3206,7 +3398,7 @@ namespace CligenceCellIDGrabber
                 try
                 {
                     Directory.CreateDirectory(dir);
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -3274,10 +3466,10 @@ namespace CligenceCellIDGrabber
                 metroGrid1.DataSource = null;
                 Progrsbr.Invoke((MethodInvoker)delegate
                 {
-                   // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
-                  
+                    // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+
                     Progrsbr.Value = 0;
-                    
+
                 });
                 //  metroComboBox1.Enabled = false;
             }
@@ -3295,6 +3487,36 @@ namespace CligenceCellIDGrabber
         {
             var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+        }
+
+        private void serialPort2_PinChanged(object sender, SerialPinChangedEventArgs e)
+        {
+            switch (e.EventType)
+            {
+                case SerialPinChange.CDChanged:
+                    MessageBox.Show("Carrier Detect (CD) pin changed.");
+                    break;
+                case SerialPinChange.CtsChanged:
+                    MessageBox.Show("Clear-to-Send (CTS) pin changed.");
+                    break;
+                case SerialPinChange.DsrChanged:
+                    MessageBox.Show("Data Set Ready (DSR) pin changed.");
+                    break;
+                case SerialPinChange.Ring:
+                    MessageBox.Show("Ring indicator (RI) pin changed.");
+                    break;
+                default:
+                    MessageBox.Show("Unknown pin change event.");
+                    break;
+            }
+            //  MessageBox.Show("Pin changed: " + e.EventType);
+        }
+
+        private void serialPort2_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        {
+            MessageBox.Show("Error received: " + e.EventType);
+
+
         }
         #region SerialportTask
         static void USBDeviceChangeHandler(object sender, EventArrivedEventArgs e)
@@ -3322,27 +3544,27 @@ namespace CligenceCellIDGrabber
             {
                 string portName = e.NewEvent.GetPropertyValue("InstanceName").ToString();
                 MessageBox.Show($"COM port {portName} removed.");
-               // Console.WriteLine($"COM port {portName} removed.");
+                // Console.WriteLine($"COM port {portName} removed.");
                 // Here you can add your logic to handle the removal of the GSM chip
             }
             else if ((uint)e.NewEvent.GetPropertyValue("EventType") == 3) // COM port added
             {
                 string portName = e.NewEvent.GetPropertyValue("InstanceName").ToString();
-                MessageBox.Show($"COM port { portName}added.");
-             //  Console.WriteLine($"COM port {portName} added.");
+                MessageBox.Show($"COM port {portName}added.");
+                //  Console.WriteLine($"COM port {portName} added.");
                 // Here you can add your logic to handle the addition of the GSM chip
             }
         }
 
-        public void  PortAddedOrRemoved(object sender, System.Management.EventArrivedEventArgs e)
+        public void PortAddedOrRemoved(object sender, System.Management.EventArrivedEventArgs e)
         {
             // Check if a COM port was added or removed
             if ((uint)e.NewEvent.GetPropertyValue("EventType") == 2) // COM port removed
             {
                 string portName = e.NewEvent.GetPropertyValue("InstanceName").ToString();
-               // Console.WriteLine($"COM port {portName} removed.");
-                MessageBox.Show($"COM port { portName} removed.");
-                if (serialPort2  != null && serialPort2.PortName == portName)
+                // Console.WriteLine($"COM port {portName} removed.");
+                MessageBox.Show($"COM port {portName} removed.");
+                if (serialPort2 != null && serialPort2.PortName == portName)
                 {
                     serialPort2.Close();
                     serialPort2 = null;
@@ -3354,7 +3576,7 @@ namespace CligenceCellIDGrabber
             {
                 string portName = e.NewEvent.GetPropertyValue("InstanceName").ToString();
                 // Console.WriteLine($"COM port {portName} added.");
-                MessageBox.Show($"COM port { portName}added.");
+                MessageBox.Show($"COM port {portName}added.");
                 if (serialPort2 == null)
                 {
                     serialPort2 = new SerialPort(portName);
