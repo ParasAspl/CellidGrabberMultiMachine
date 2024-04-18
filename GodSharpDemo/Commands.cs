@@ -173,7 +173,7 @@ namespace CligenceCellIDGrabber
                 btnStop.Visible = false;
                 btnStart.Visible = true;
                 btnStart.Enabled = false;
-                btnConnect.Enabled = false;
+                btnConnect.Enabled = true;
                 try
                 {
                     try
@@ -1920,16 +1920,18 @@ namespace CligenceCellIDGrabber
                 //{
                 try
                 {
-                    SerialPort port = new SerialPort(ports[0].Trim(), 115200, Parity.None, 8, StopBits.One);
+                    
+                  // SerialPort port = new SerialPort(ports[0].Trim(), 115200, Parity.None, 8, StopBits.One);
+                    //SerialPort port = new SerialPort(serialPort2.PortName.Trim(), 115200);
                     //SerialPort port = new SerialPort(ports[0]);
                     //if (serialPort2.PortName.Trim() == port.PortName.Trim())
                     //{
                     //     port = new SerialPort(ports[1]);
                     //}
-                    port.DtrEnable = true;
-                    port.RtsEnable = true;
+                    //port.DtrEnable = true;
+                   //// port.RtsEnable = true;
                     Thread.Sleep(2000);
-                    port.Open();
+                   // port.Open();
                 }
                 catch (Exception ex)
                 {
