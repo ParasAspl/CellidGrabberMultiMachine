@@ -100,23 +100,21 @@ namespace CligenceCellIDGrabber
             this.metroPanel1.Controls.Add(this.metroComboBox1);
             this.metroPanel1.HorizontalScrollbarBarColor = true;
             this.metroPanel1.HorizontalScrollbarHighlightOnWheel = false;
-            this.metroPanel1.HorizontalScrollbarSize = 15;
-            this.metroPanel1.Location = new System.Drawing.Point(30, 148);
-            this.metroPanel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.metroPanel1.HorizontalScrollbarSize = 10;
+            this.metroPanel1.Location = new System.Drawing.Point(20, 96);
             this.metroPanel1.Name = "metroPanel1";
-            this.metroPanel1.Size = new System.Drawing.Size(1896, 214);
+            this.metroPanel1.Size = new System.Drawing.Size(1247, 139);
             this.metroPanel1.TabIndex = 0;
             this.metroPanel1.VerticalScrollbarBarColor = true;
             this.metroPanel1.VerticalScrollbarHighlightOnWheel = false;
-            this.metroPanel1.VerticalScrollbarSize = 15;
+            this.metroPanel1.VerticalScrollbarSize = 10;
             // 
             // Progrsbr
             // 
             this.Progrsbr.HideProgressText = false;
-            this.Progrsbr.Location = new System.Drawing.Point(0, 155);
-            this.Progrsbr.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Progrsbr.Location = new System.Drawing.Point(3, 106);
             this.Progrsbr.Name = "Progrsbr";
-            this.Progrsbr.Size = new System.Drawing.Size(1863, 35);
+            this.Progrsbr.Size = new System.Drawing.Size(1227, 23);
             this.Progrsbr.TabIndex = 17;
             this.Progrsbr.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -124,10 +122,9 @@ namespace CligenceCellIDGrabber
             // 
             this.btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.btnClear.ForeColor = System.Drawing.Color.White;
-            this.btnClear.Location = new System.Drawing.Point(890, 15);
-            this.btnClear.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnClear.Location = new System.Drawing.Point(593, 10);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(150, 52);
+            this.btnClear.Size = new System.Drawing.Size(100, 34);
             this.btnClear.TabIndex = 12;
             this.btnClear.Text = "CLEAR";
             this.btnClear.UseCustomBackColor = true;
@@ -144,10 +141,9 @@ namespace CligenceCellIDGrabber
             this.cmbMode.Items.AddRange(new object[] {
             "Fast",
             "Deep"});
-            this.cmbMode.Location = new System.Drawing.Point(476, 102);
-            this.cmbMode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.cmbMode.Location = new System.Drawing.Point(317, 66);
             this.cmbMode.Name = "cmbMode";
-            this.cmbMode.Size = new System.Drawing.Size(138, 29);
+            this.cmbMode.Size = new System.Drawing.Size(93, 29);
             this.cmbMode.TabIndex = 11;
             this.cmbMode.UseSelectable = true;
             this.cmbMode.SelectedIndexChanged += new System.EventHandler(this.cmbMode_SelectedIndexChanged);
@@ -155,8 +151,7 @@ namespace CligenceCellIDGrabber
             // lblMode
             // 
             this.lblMode.AutoSize = true;
-            this.lblMode.Location = new System.Drawing.Point(339, 117);
-            this.lblMode.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblMode.Location = new System.Drawing.Point(226, 76);
             this.lblMode.Name = "lblMode";
             this.lblMode.Size = new System.Drawing.Size(85, 19);
             this.lblMode.TabIndex = 10;
@@ -166,10 +161,9 @@ namespace CligenceCellIDGrabber
             // 
             this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Location = new System.Drawing.Point(1064, 15);
-            this.btnSave.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnSave.Location = new System.Drawing.Point(709, 10);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(150, 52);
+            this.btnSave.Size = new System.Drawing.Size(100, 34);
             this.btnSave.TabIndex = 9;
             this.btnSave.Text = "SAVE";
             this.btnSave.UseCustomBackColor = true;
@@ -183,10 +177,9 @@ namespace CligenceCellIDGrabber
             this.DdlMode.Enabled = false;
             this.DdlMode.FormattingEnabled = true;
             this.DdlMode.ItemHeight = 23;
-            this.DdlMode.Location = new System.Drawing.Point(129, 102);
-            this.DdlMode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.DdlMode.Location = new System.Drawing.Point(86, 66);
             this.DdlMode.Name = "DdlMode";
-            this.DdlMode.Size = new System.Drawing.Size(199, 29);
+            this.DdlMode.Size = new System.Drawing.Size(134, 29);
             this.DdlMode.TabIndex = 8;
             this.DdlMode.UseSelectable = true;
             this.DdlMode.SelectedIndexChanged += new System.EventHandler(this.DdlMode_SelectedIndexChanged);
@@ -194,8 +187,7 @@ namespace CligenceCellIDGrabber
             // lblRegion
             // 
             this.lblRegion.AutoSize = true;
-            this.lblRegion.Location = new System.Drawing.Point(462, 26);
-            this.lblRegion.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblRegion.Location = new System.Drawing.Point(308, 17);
             this.lblRegion.Name = "lblRegion";
             this.lblRegion.Size = new System.Drawing.Size(57, 19);
             this.lblRegion.TabIndex = 7;
@@ -205,8 +197,7 @@ namespace CligenceCellIDGrabber
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(222, 26);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblStatus.Location = new System.Drawing.Point(148, 17);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(131, 19);
             this.lblStatus.TabIndex = 6;
@@ -216,10 +207,9 @@ namespace CligenceCellIDGrabber
             // 
             this.btnDisconnect.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.btnDisconnect.ForeColor = System.Drawing.Color.White;
-            this.btnDisconnect.Location = new System.Drawing.Point(24, 15);
-            this.btnDisconnect.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnDisconnect.Location = new System.Drawing.Point(16, 10);
             this.btnDisconnect.Name = "btnDisconnect";
-            this.btnDisconnect.Size = new System.Drawing.Size(150, 52);
+            this.btnDisconnect.Size = new System.Drawing.Size(100, 34);
             this.btnDisconnect.TabIndex = 4;
             this.btnDisconnect.Text = "DISCONNECT";
             this.btnDisconnect.UseCustomBackColor = true;
@@ -231,10 +221,9 @@ namespace CligenceCellIDGrabber
             // 
             this.btnConnect.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.btnConnect.ForeColor = System.Drawing.Color.White;
-            this.btnConnect.Location = new System.Drawing.Point(24, 15);
-            this.btnConnect.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnConnect.Location = new System.Drawing.Point(16, 10);
             this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(150, 52);
+            this.btnConnect.Size = new System.Drawing.Size(100, 34);
             this.btnConnect.TabIndex = 4;
             this.btnConnect.Text = "CONNECT";
             this.btnConnect.UseCustomBackColor = true;
@@ -247,10 +236,9 @@ namespace CligenceCellIDGrabber
             // 
             this.btnStop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.btnStop.ForeColor = System.Drawing.Color.White;
-            this.btnStop.Location = new System.Drawing.Point(1064, 102);
-            this.btnStop.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnStop.Location = new System.Drawing.Point(709, 66);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(150, 52);
+            this.btnStop.Size = new System.Drawing.Size(100, 34);
             this.btnStop.TabIndex = 4;
             this.btnStop.Text = "STOP";
             this.btnStop.UseCustomBackColor = true;
@@ -264,10 +252,9 @@ namespace CligenceCellIDGrabber
             this.btnStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.btnStart.Enabled = false;
             this.btnStart.ForeColor = System.Drawing.Color.White;
-            this.btnStart.Location = new System.Drawing.Point(1064, 102);
-            this.btnStart.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnStart.Location = new System.Drawing.Point(709, 66);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(150, 52);
+            this.btnStart.Size = new System.Drawing.Size(100, 34);
             this.btnStart.TabIndex = 4;
             this.btnStart.Text = "START";
             this.btnStart.UseCustomBackColor = true;
@@ -279,8 +266,7 @@ namespace CligenceCellIDGrabber
             // metroLabel2
             // 
             this.metroLabel2.AutoSize = true;
-            this.metroLabel2.Location = new System.Drawing.Point(644, 117);
-            this.metroLabel2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.metroLabel2.Location = new System.Drawing.Point(429, 76);
             this.metroLabel2.Name = "metroLabel2";
             this.metroLabel2.Size = new System.Drawing.Size(130, 19);
             this.metroLabel2.TabIndex = 3;
@@ -289,8 +275,7 @@ namespace CligenceCellIDGrabber
             // metroLabel1
             // 
             this.metroLabel1.AutoSize = true;
-            this.metroLabel1.Location = new System.Drawing.Point(4, 117);
-            this.metroLabel1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.metroLabel1.Location = new System.Drawing.Point(3, 76);
             this.metroLabel1.Name = "metroLabel1";
             this.metroLabel1.Size = new System.Drawing.Size(77, 19);
             this.metroLabel1.TabIndex = 3;
@@ -301,10 +286,9 @@ namespace CligenceCellIDGrabber
             this.metroComboBox1.Enabled = false;
             this.metroComboBox1.FormattingEnabled = true;
             this.metroComboBox1.ItemHeight = 23;
-            this.metroComboBox1.Location = new System.Drawing.Point(848, 102);
-            this.metroComboBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.metroComboBox1.Location = new System.Drawing.Point(565, 66);
             this.metroComboBox1.Name = "metroComboBox1";
-            this.metroComboBox1.Size = new System.Drawing.Size(190, 29);
+            this.metroComboBox1.Size = new System.Drawing.Size(128, 29);
             this.metroComboBox1.TabIndex = 2;
             this.metroComboBox1.UseSelectable = true;
             this.metroComboBox1.SelectionChangeCommitted += new System.EventHandler(this.metroComboBox1_SelectionChangeCommitted);
@@ -320,28 +304,26 @@ namespace CligenceCellIDGrabber
             this.metroPanel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.metroPanel2.HorizontalScrollbarBarColor = true;
             this.metroPanel2.HorizontalScrollbarHighlightOnWheel = false;
-            this.metroPanel2.HorizontalScrollbarSize = 15;
-            this.metroPanel2.Location = new System.Drawing.Point(30, 92);
-            this.metroPanel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.metroPanel2.HorizontalScrollbarSize = 10;
+            this.metroPanel2.Location = new System.Drawing.Point(20, 60);
             this.metroPanel2.Name = "metroPanel2";
-            this.metroPanel2.Size = new System.Drawing.Size(1868, 56);
+            this.metroPanel2.Size = new System.Drawing.Size(1247, 36);
             this.metroPanel2.TabIndex = 2;
             this.metroPanel2.UseCustomBackColor = true;
             this.metroPanel2.UseCustomForeColor = true;
             this.metroPanel2.UseStyleColors = true;
             this.metroPanel2.VerticalScrollbarBarColor = true;
             this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
-            this.metroPanel2.VerticalScrollbarSize = 15;
+            this.metroPanel2.VerticalScrollbarSize = 10;
             // 
             // lblContactDetail
             // 
             this.lblContactDetail.FontSize = MetroFramework.MetroLabelSize.Tall;
             this.lblContactDetail.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.lblContactDetail.ForeColor = System.Drawing.Color.White;
-            this.lblContactDetail.Location = new System.Drawing.Point(1540, 0);
-            this.lblContactDetail.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblContactDetail.Location = new System.Drawing.Point(1027, 0);
             this.lblContactDetail.Name = "lblContactDetail";
-            this.lblContactDetail.Size = new System.Drawing.Size(300, 51);
+            this.lblContactDetail.Size = new System.Drawing.Size(200, 33);
             this.lblContactDetail.TabIndex = 10;
             this.lblContactDetail.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lblContactDetail.UseCustomBackColor = true;
@@ -354,10 +336,9 @@ namespace CligenceCellIDGrabber
             this.lblDate.FontSize = MetroFramework.MetroLabelSize.Tall;
             this.lblDate.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.lblDate.ForeColor = System.Drawing.Color.White;
-            this.lblDate.Location = new System.Drawing.Point(934, 0);
-            this.lblDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblDate.Location = new System.Drawing.Point(623, 0);
             this.lblDate.Name = "lblDate";
-            this.lblDate.Size = new System.Drawing.Size(300, 51);
+            this.lblDate.Size = new System.Drawing.Size(200, 33);
             this.lblDate.TabIndex = 9;
             this.lblDate.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblDate.UseCustomBackColor = true;
@@ -370,10 +351,9 @@ namespace CligenceCellIDGrabber
             this.lblApplicationVersion.FontSize = MetroFramework.MetroLabelSize.Tall;
             this.lblApplicationVersion.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.lblApplicationVersion.ForeColor = System.Drawing.Color.White;
-            this.lblApplicationVersion.Location = new System.Drawing.Point(516, 5);
-            this.lblApplicationVersion.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblApplicationVersion.Location = new System.Drawing.Point(344, 3);
             this.lblApplicationVersion.Name = "lblApplicationVersion";
-            this.lblApplicationVersion.Size = new System.Drawing.Size(258, 51);
+            this.lblApplicationVersion.Size = new System.Drawing.Size(172, 33);
             this.lblApplicationVersion.TabIndex = 8;
             this.lblApplicationVersion.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblApplicationVersion.UseCustomBackColor = true;
@@ -386,10 +366,9 @@ namespace CligenceCellIDGrabber
             this.lblCompanyName.FontSize = MetroFramework.MetroLabelSize.Tall;
             this.lblCompanyName.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.lblCompanyName.ForeColor = System.Drawing.Color.White;
-            this.lblCompanyName.Location = new System.Drawing.Point(4, 0);
-            this.lblCompanyName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblCompanyName.Location = new System.Drawing.Point(3, 0);
             this.lblCompanyName.Name = "lblCompanyName";
-            this.lblCompanyName.Size = new System.Drawing.Size(300, 51);
+            this.lblCompanyName.Size = new System.Drawing.Size(200, 33);
             this.lblCompanyName.TabIndex = 7;
             this.lblCompanyName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblCompanyName.UseCustomBackColor = true;
@@ -423,10 +402,9 @@ namespace CligenceCellIDGrabber
             this.loader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(174)))), ((int)(((byte)(219)))));
             this.loader.ErrorImage = ((System.Drawing.Image)(resources.GetObject("loader.ErrorImage")));
             this.loader.Image = ((System.Drawing.Image)(resources.GetObject("loader.Image")));
-            this.loader.Location = new System.Drawing.Point(720, 535);
-            this.loader.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.loader.Location = new System.Drawing.Point(480, 348);
             this.loader.Name = "loader";
-            this.loader.Size = new System.Drawing.Size(210, 202);
+            this.loader.Size = new System.Drawing.Size(140, 131);
             this.loader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.loader.TabIndex = 10;
             this.loader.TabStop = false;
@@ -464,8 +442,8 @@ namespace CligenceCellIDGrabber
             this.metroGrid1.EnableHeadersVisualStyles = false;
             this.metroGrid1.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.metroGrid1.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.metroGrid1.Location = new System.Drawing.Point(30, 403);
-            this.metroGrid1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 5);
+            this.metroGrid1.Location = new System.Drawing.Point(20, 262);
+            this.metroGrid1.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.metroGrid1.Name = "metroGrid1";
             this.metroGrid1.ReadOnly = true;
             this.metroGrid1.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
@@ -487,13 +465,14 @@ namespace CligenceCellIDGrabber
             this.metroGrid1.RowTemplate.DividerHeight = 1;
             this.metroGrid1.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.metroGrid1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.metroGrid1.Size = new System.Drawing.Size(1896, 588);
+            this.metroGrid1.Size = new System.Drawing.Size(1264, 382);
             this.metroGrid1.StandardTab = true;
             this.metroGrid1.Style = MetroFramework.MetroColorStyle.Blue;
             this.metroGrid1.TabIndex = 1;
             this.metroGrid1.UseCustomBackColor = true;
             this.metroGrid1.UseCustomForeColor = true;
             this.metroGrid1.UseStyleColors = true;
+            this.metroGrid1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.metroGrid1_KeyDown);
             // 
             // lblmsg
             // 
@@ -502,8 +481,8 @@ namespace CligenceCellIDGrabber
             this.lblmsg.Enabled = false;
             this.lblmsg.FontWeight = MetroFramework.MetroLabelWeight.Regular;
             this.lblmsg.ForeColor = System.Drawing.Color.Black;
-            this.lblmsg.Location = new System.Drawing.Point(54, 369);
-            this.lblmsg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.lblmsg.Location = new System.Drawing.Point(36, 240);
+            this.lblmsg.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
             this.lblmsg.Name = "lblmsg";
             this.lblmsg.Size = new System.Drawing.Size(89, 19);
             this.lblmsg.TabIndex = 15;
@@ -520,19 +499,17 @@ namespace CligenceCellIDGrabber
             // 
             // Commands
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BorderStyle = MetroFramework.Forms.MetroFormBorderStyle.FixedSingle;
-            this.ClientSize = new System.Drawing.Size(1928, 851);
+            this.ClientSize = new System.Drawing.Size(1287, 512);
             this.Controls.Add(this.lblmsg);
             this.Controls.Add(this.loader);
             this.Controls.Add(this.metroPanel2);
             this.Controls.Add(this.metroPanel1);
             this.Controls.Add(this.metroGrid1);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Commands";
-            this.Padding = new System.Windows.Forms.Padding(30, 92, 30, 31);
             this.ShowIcon = false;
             this.Text = "Cligence Cell ID Grabber";
             this.TransparencyKey = System.Drawing.Color.Red;

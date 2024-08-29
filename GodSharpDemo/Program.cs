@@ -24,6 +24,7 @@ namespace CligenceCellIDGrabber
         [STAThread]
         static async Task Main()
         {
+            bool isActive = true;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //if (EncryptionHelper.CheckForInternetConnection())
@@ -46,44 +47,47 @@ namespace CligenceCellIDGrabber
                 }
                 Dictionary<string, string> postData = new Dictionary<string, string>();
                 postData.Add("key", key[0]);//"62220182b8deb" 64e72a5c4a8fa
+               
                 if (EncryptionHelper.CheckForInternetConnection())
                 {
                     var result = await PostHTTPRequestAsync("https://msg.ccas.in/api/cellId/productKey", postData);
                     if (result.Contains("deactivated"))
                     {
-                        //MessageBox.Show(result.ToString());
-                        Application.Run(new ActivationForm());
-                        //return;
+                        isActive = false;
+                        MessageBox.Show(result.ToString());
+                       // Application.Run(new ActivationForm());
+                        return;
                     }
                 }
-
-                if (key.Length > 0 && GetID() == key[1])
+                if (isActive)
                 {
-                    if (!Machine.Contains("Quectel") && MachineType)
-                        Application.Run(new Dashboard());
-                    else if ((MachineType) && Machine.Contains("Quectel"))
+                    if (key.Length > 0 && GetID() == key[1])
                     {
-                        Application.Run(new Commands());
-                        //Dashboard dsb = new Dashboard();
-                        //dsb.Show();
-                        //Application.Run(new Dashboard5G());
+                        if (!Machine.Contains("Quectel") && MachineType)
+                            Application.Run(new Dashboard());
+                        else if ((MachineType) && Machine.Contains("Quectel"))
+                        {
+                            Application.Run(new Commands());
+                            //Dashboard dsb = new Dashboard();
+                            //dsb.Show();
+                            //Application.Run(new Dashboard5G());
+                        }
+                        else
+                        {
+                            //  Application.Run(new Commands());
+                            //Application.Run(new Commands());
+                            MessageBox.Show("Please connect Machine");
+                            //  else
+                            //Dashboard dsb = new Dashboard();
+                            //dsb.Show();
+                        }
                     }
                     else
                     {
-                      //  Application.Run(new Commands());
-                        //Application.Run(new Commands());
-                       MessageBox.Show("Please connect Machine");
-                        //  else
-                        //Dashboard dsb = new Dashboard();
-                        //dsb.Show();
+                        Application.Run(new ActivationForm());
+
                     }
                 }
-                else
-                {
-                    Application.Run(new ActivationForm());
-
-                }
-
             }
             else
             {

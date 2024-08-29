@@ -126,7 +126,7 @@ namespace CligenceCellIDGrabber
                 var response = JsonConvert.DeserializeObject<ProductKeyValidation>(result);
                 //  var deptList = JsonSerializer.Deserialize<IList<ProductKeyValidation>>(response);
                 string status = response.error;
-                
+               // { "status":true,"error":"Licence key has been verified.","mobile":"9090909091","product_key":"662d15a67eed7","is_used":"0","firstName":"Test","lastName":"","displayName":"Test ","urlName":"test-"}
                 if (status != null && status.ToString().Contains("Licence key has been verified."))
                 {
                     GetfileData(SystemId(), txtActivationKey.Text, response.mobile,response.firstName,response.displayName,response.lastName);

@@ -25,6 +25,8 @@ namespace CligenceCellIDGrabber
 {
     public partial class Commands : MetroForm
     {
+        private CancellationTokenSource _cancellationTokenSource;
+
         static bool lockk = false;
         //change path
         //string outputFile = "";// @"C:\amar\output.txt";
@@ -53,6 +55,7 @@ namespace CligenceCellIDGrabber
         {
 
             InitializeComponent();
+            _cancellationTokenSource = new CancellationTokenSource();
 
             (new DropShadow()).ApplyShadows(this);
             btnConnect.Visible = true;
@@ -96,7 +99,7 @@ namespace CligenceCellIDGrabber
             }
             CancellationTokenSource tokenSource = new CancellationTokenSource();
 
-            Task timerTask = RunPeriodically(Checkport, TimeSpan.FromSeconds(15), tokenSource.Token);
+            Task timerTask = RunPeriodically(Checkport, TimeSpan.FromSeconds(10), tokenSource.Token);
             // String mccMnc = File.ReadAllText("mcc-mnc.txt");
             string mccMnc = MNC_MCC.GetMCCMNC;
             oneD = mccMnc.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
@@ -148,14 +151,15 @@ namespace CligenceCellIDGrabber
                 await Task.Delay(interval, token);
             }
         }
-        public void Checkport()
+        public async void Checkport()
         {
 
             if (serialPort2 != null && !serialPort2.IsOpen && this.loader.Visible)
             {
                 try
                 {
-                    serialPort2.Close();
+                    await Task.Run(() => serialPort2.Close());
+                    ////serialPort2.Close();
                 }
                 catch (Exception ex)
                 { }
@@ -178,7 +182,7 @@ namespace CligenceCellIDGrabber
                 {
                     try
                     {
-                        serialPort2.Close();
+                        await Task.Run(() => serialPort2.Close());
                     }
                     catch (Exception ex) { }
                     // scannedCellId.Clear();
@@ -204,16 +208,16 @@ namespace CligenceCellIDGrabber
                     //}
                     if (!serialPort2.IsOpen && this.btnStart.Visible)
                     {
-                        port = srport();
-                        Thread.Sleep(3000);
-                        bool status = establishConnection();
-                        if (status)
-                        {
-                            if (region == "NA")
-                            {
-                                regionloader.RunWorkerAsync();
-                            }
-                        }
+                        port = await Task.Run(() => srport());
+                        //Thread.Sleep(3000);
+                        //bool status = establishConnection();
+                        //if (status)
+                        //{
+                        //    if (region == "NA")
+                        //    {
+                        //        regionloader.RunWorkerAsync();
+                        //    }
+                        //}
 
                     }
                     else
@@ -230,7 +234,28 @@ namespace CligenceCellIDGrabber
             }
 
         }
-
+        private async Task StartIoTProcessAsync(CancellationToken token)
+        {
+            try
+            {
+                // Simulated long-running IoT process
+                while (!token.IsCancellationRequested)
+                {
+                    // Example: Replace with actual IoT communication logic
+                    await Task.Delay(1000); // Simulate doing work
+                    Console.WriteLine("Running IoT command...");
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("IoT process was canceled.");
+            }
+            finally
+            {
+                // Perform any cleanup here
+                Console.WriteLine("IoT process stopped.");
+            }
+        }
         private string hexToInteger(string ascii)
         {
             try
@@ -261,12 +286,27 @@ namespace CligenceCellIDGrabber
         }
         #region Start/Stop
         [STAThread]
-        private void btnStart_Click(object sender, EventArgs e)
+        private async void btnStart_Click(object sender, EventArgs e)
         {
             Countok = 0;
+            //  _cancellationTokenSource = new CancellationTokenSource(); // Create a new token source for the new operation
+            // await StartIoTProcessAsync(_cancellationTokenSource.Token);
+            TypeText selectedNetworks = DdlMode.SelectedItem as TypeText;
+            TypeText selectedNetworkcs = metroComboBox1.SelectedItem as TypeText;
             try
             {
-                serialPort2.DataReceived += serialPort2_DataReceived;
+                if (selectedNetworkcs == null || selectedNetworks == null || selectedNetworks.Name == "Select" || selectedNetworkcs.Name == "Select")
+                {
+                    MessageBox.Show("Please select Network Type and Type");
+                    loader.Invoke((MethodInvoker)delegate
+                    {
+                        loader.Visible = false;
+                    });
+
+                    return;
+                }
+                await Task.Run(() => serialPort2.DataReceived += serialPort2_DataReceived);
+                //  serialPort2.DataReceived += serialPort2_DataReceived;
             }
             catch (Exception ex)
             {
@@ -311,13 +351,7 @@ namespace CligenceCellIDGrabber
             //    var ver = Assembly.GetExecutingAssembly().GetName().Version;
             //    string j= string.Format("Product Name: {4}, Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Assembly.GetEntryAssembly().GetName().Name);
             //}
-            TypeText selectedNetworks = DdlMode.SelectedItem as TypeText;
-            TypeText selectedNetworkcs = metroComboBox1.SelectedItem as TypeText;
-            if (selectedNetworkcs == null || selectedNetworks == null || selectedNetworks.Name == "Select" || selectedNetworkcs.Name == "Select")
-            {
-                MessageBox.Show("Please select Network Type and Type");
-                return;
-            }
+
             string ddlmode = selectedNetworks.Name;
 
             string networkType = selectedNetworkcs.Name;
@@ -433,6 +467,9 @@ namespace CligenceCellIDGrabber
             //outputFile = @"C:\amar\2goutput.txt";
 
             string c4 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+            //add new cmd
+            string c4n = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+
             string c1 = (@"AT+QNWPREFCFG=""mode_pref"",WCDMA").Replace("\r", "").Replace("\n", "");
             // string c2 = ("At+cops=?").Replace("\r", "").Replace("\n", "");
             string c3 = (@"AT+QENG=""servingcell""").Replace("\r", "").Replace("\n", "");
@@ -472,12 +509,19 @@ namespace CligenceCellIDGrabber
                     serialWrite(c4);//);
                     Thread.Sleep(2000);
                 }
-                if (Countok > 8 && Countok < 11)
+                //Add new command
+                if (Countok > 8 && Countok < 10)
+                {
+                    serialWrite(c4n);//);
+                    Thread.Sleep(2000);
+                }
+
+                if (Countok > 9 && Countok < 12)
                 {
                     serialWrite("AT+QSCAN=2,1");//);
                     Thread.Sleep(2000);
                 }
-                if (Countok > 10 && Countok < 13)
+                if (Countok > 11 && Countok < 14)
                 {
                     serialWrite("AT+QSCAN=3,1"); Thread.Sleep(2000);
                 }
@@ -610,6 +654,9 @@ namespace CligenceCellIDGrabber
                     Thread.Sleep(2000);
                 }
                 string c33 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                //add new cmd
+                string c33n = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+
                 string c11 = ("AT+QSCAN=2,1").Replace("\r", "").Replace("\n", "");
                 string c2 = ("AT+QSCAN=3,1").Replace("\r", "").Replace("\n", "");
 
@@ -618,12 +665,18 @@ namespace CligenceCellIDGrabber
                     serialWrite(c33);//);
                     Thread.Sleep(2000);
                 }
-                if (Countok > 39 && Countok < 42)
+                //add new command
+                if (Countok > 39 && Countok < 41)
+                {
+                    serialWrite(c33n);
+                    Thread.Sleep(2000);
+                }
+                if (Countok > 40 && Countok < 43)
                 {
                     serialWrite(c11);
                     Thread.Sleep(2000);
                 }
-                if (Countok > 41 && Countok < 44)
+                if (Countok > 42 && Countok < 45)
                 {
                     serialWrite(c2);
                     Thread.Sleep(2000);
@@ -634,196 +687,393 @@ namespace CligenceCellIDGrabber
                     MessageBox.Show("Device is not connected.Scan will stop");
                     return;
                 }
-                if (Countok > 43 && Countok < 49)
+
+                if (Countok > 44 && Countok < 50)
                 {
-                    if (Countok > 43 && Countok < 45)
+                    if (Countok > 44 && Countok < 46)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[0]); Thread.Sleep(2000);
                     }
-                    if (Countok > 44 && Countok < 47)
+                    if (Countok > 45 && Countok < 48)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 46 && Countok < 49)
+                    if (Countok > 47 && Countok < 50)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
                 }
-                if (Countok > 48 && Countok < 54)
+                if (Countok > 49 && Countok < 55)
                 {
-                    if (Countok > 48 && Countok < 50)
+                    if (Countok > 49 && Countok < 51)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[1]); Thread.Sleep(2000);
                     }
-                    if (Countok > 49 && Countok < 52)
+                    if (Countok > 50 && Countok < 53)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 51 && Countok < 54)
+                    if (Countok > 52 && Countok < 55)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
                 }
-                if (Countok > 53 && Countok < 59)
+                if (Countok > 54 && Countok < 60)
                 {
-                    if (Countok > 53 && Countok < 55)
+                    if (Countok > 54 && Countok < 56)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[2]); Thread.Sleep(2000);
                     }
-                    if (Countok > 54 && Countok < 57)
+                    if (Countok > 55 && Countok < 58)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 56 && Countok < 59)
+                    if (Countok > 57 && Countok < 60)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
                 }
-                if (Countok > 58 && Countok < 64)
+                if (Countok > 59 && Countok < 65)
                 {
-                    if (Countok > 58 && Countok < 60)
+                    if (Countok > 59 && Countok < 61)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[3]); Thread.Sleep(2000);
                     }
-                    if (Countok > 59 && Countok < 62)
+                    if (Countok > 60 && Countok < 63)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 61 && Countok < 64)
+                    if (Countok > 62 && Countok < 65)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
                 }
-                if (Countok > 63 && Countok < 69)
+                if (Countok > 64 && Countok < 70)
                 {
-                    if (Countok > 63 && Countok < 65)
+                    if (Countok > 64 && Countok < 66)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[4]); Thread.Sleep(2000);
                     }
-                    if (Countok > 64 && Countok < 67)
+                    if (Countok > 65 && Countok < 68)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 66 && Countok < 69)
+                    if (Countok > 67 && Countok < 70)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
                 }
-                if (Countok > 68 && Countok < 74)
+                if (Countok > 69 && Countok < 75)
                 {
-                    if (Countok > 68 && Countok < 70)
+                    if (Countok > 69 && Countok < 71)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[5]); Thread.Sleep(2000);
                     }
-                    if (Countok > 69 && Countok < 72)
+                    if (Countok > 70 && Countok < 73)
                     {
                         serialWrite(c11); Thread.Sleep(4000);
                     }
-                    if (Countok > 71 && Countok < 74)
+                    if (Countok > 72 && Countok < 75)
                     {
                         serialWrite(c2); Thread.Sleep(4000);
                     }
                 }
-                if (Countok > 73 && Countok < 79)
+                if (Countok > 74 && Countok < 80)
                 {
-                    if (Countok > 73 && Countok < 75)
+                    if (Countok > 74 && Countok < 76)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[6]); Thread.Sleep(2000);
                     }
-                    if (Countok > 74 && Countok < 77)
+                    if (Countok > 75 && Countok < 78)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 76 && Countok < 79)
+                    if (Countok > 77 && Countok < 80)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
                 }
-                if (Countok > 78 && Countok < 84)
+                if (Countok > 79 && Countok < 85)
                 {
-                    if (Countok > 78 && Countok < 80)
+                    if (Countok > 79 && Countok < 81)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[7]); Thread.Sleep(2000);
                     }
-                    if (Countok > 79 && Countok < 82)
+                    if (Countok > 80 && Countok < 83)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 81 && Countok < 84)
+                    if (Countok > 82 && Countok < 85)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
                 }
-                if (Countok > 83 && Countok < 89)
+                if (Countok > 84 && Countok < 90)
                 {
-                    if (Countok > 83 && Countok < 85)
+                    if (Countok > 84 && Countok < 86)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[8]); Thread.Sleep(2000);
                     }
-                    if (Countok > 84 && Countok < 87)
+                    if (Countok > 85 && Countok < 88)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 86 && Countok < 89)
+                    if (Countok > 87 && Countok < 90)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
                 }
-                if (Countok > 89 && Countok < 95)
+                if (Countok > 90 && Countok < 96)
                 {
-                    if (Countok > 89 && Countok < 91)
+                    if (Countok > 90 && Countok < 92)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[9]); Thread.Sleep(2000);
                     }
-                    if (Countok > 90 && Countok < 93)
+                    if (Countok > 91 && Countok < 94)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 92 && Countok < 95)
+                    if (Countok > 93 && Countok < 96)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
                 }
-                if (Countok > 94 && Countok < 100)
+                if (Countok > 95 && Countok < 101)
                 {
-                    if (Countok > 94 && Countok < 96)
+                    if (Countok > 95 && Countok < 97)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[10]); Thread.Sleep(2000);
                     }
-                    if (Countok > 95 && Countok < 98)
+                    if (Countok > 96 && Countok < 99)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 97 && Countok < 100)
+                    if (Countok > 98 && Countok < 101)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
                 }
-                if (Countok > 99 && Countok < 105)
+                if (Countok > 100 && Countok < 106)
                 {
-                    if (Countok > 98 && Countok < 100)
+                    if (Countok > 99 && Countok < 101)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[11]); Thread.Sleep(2000);
                     }
-                    if (Countok > 99 && Countok < 102)
+                    if (Countok > 100 && Countok < 103)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
-                    if (Countok > 101 && Countok < 104)
+                    if (Countok > 102 && Countok < 105)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
                 }
-                if (Countok > 103 && Countok < 105)
+                //for new band add one by one
+
+                if (Countok > 104 && Countok < 110)
+                {
+                    if (Countok > 111 && Countok < 113)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[0]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 112 && Countok < 115)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 114 && Countok < 117)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+                }
+                if (Countok > 116 && Countok < 122)
+                {
+                    if (Countok > 116 && Countok < 118)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[1]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 117 && Countok < 120)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 119 && Countok < 122)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+                }
+                if (Countok > 121 && Countok < 127)
+                {
+                    if (Countok > 121 && Countok < 123)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[2]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 122 && Countok < 125)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 124 && Countok < 127)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+                }
+                if (Countok > 126 && Countok < 132)
+                {
+                    if (Countok > 131 && Countok < 133)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[3]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 132 && Countok < 135)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 134 && Countok < 137)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+
+                }
+                if (Countok > 136 && Countok < 142)
+                {
+                    if (Countok > 141 && Countok < 143)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[4]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 142 && Countok < 145)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 144 && Countok < 147)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+                }
+                if (Countok > 146 && Countok < 152)
+                {
+                    if (Countok > 151 && Countok < 153)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[5]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 152 && Countok < 155)
+                    {
+                        serialWrite(c11); Thread.Sleep(4000);
+                    }
+                    if (Countok > 154 && Countok < 157)
+                    {
+                        serialWrite(c2); Thread.Sleep(4000);
+                    }
+                }
+                if (Countok > 156 && Countok < 162)
+                {
+                    if (Countok > 161 && Countok < 163)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[6]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 162 && Countok < 165)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 164 && Countok < 167)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+
+                }
+                if (Countok > 166 && Countok < 172)
+                {
+                    if (Countok > 171 && Countok < 173)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[7]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 172 && Countok < 175)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 174 && Countok < 177)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+
+                }
+                if (Countok > 176 && Countok < 182)
+                {
+                    if (Countok > 176 && Countok < 178)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[8]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 177 && Countok < 180)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 179 && Countok < 182)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+
+                }
+                if (Countok > 181 && Countok < 187)
+                {
+                    if (Countok > 181 && Countok < 183)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[9]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 182 && Countok < 185)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 184 && Countok < 187)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+                }
+                if (Countok > 186 && Countok < 192)
+                {
+                    if (Countok > 186 && Countok < 188)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[10]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 187 && Countok < 190)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 189 && Countok < 192)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+
+                }
+                if (Countok > 191 && Countok < 197)
+                {
+                    if (Countok > 191 && Countok < 193)
+                    {
+                        serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[11]); Thread.Sleep(2000);
+                    }
+                    if (Countok > 192 && Countok < 195)
+                    {
+                        serialWrite(c11); Thread.Sleep(2000);
+                    }
+                    if (Countok > 194 && Countok < 197)
+                    {
+                        serialWrite(c2); Thread.Sleep(2000);
+                    }
+                }
+                //for new band add one by one
+
+
+
+                if (Countok > 196 && Countok < 198)
                 {
                     serialWrite(c33);
+                    Thread.Sleep(2000);
+                }
+                if (Countok > 197 && Countok < 199)
+                {
+                    serialWrite(c33n);
                     Thread.Sleep(2000);
                 }
             }
@@ -1035,7 +1285,7 @@ namespace CligenceCellIDGrabber
                     //    serialWrite("AT+QSCAN=3,1");
                     //    Thread.Sleep(10000);
                     //}
-                    if (Countok >= 36 && Countok <= 37)
+                    if (Countok <= 38)
                     {
                         serialWrite(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71");
                         Thread.Sleep(2000);
@@ -1063,6 +1313,8 @@ namespace CligenceCellIDGrabber
                 len = 11;
                 //outputFile = @"C:\amar\2goutput.txt";
                 string c3 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                string c4 = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+
                 string c1 = ("AT+QSCAN=2,1").
                     Replace("\r", "").Replace("\n", "");
                 string c2 = ("AT+QSCAN=3,1").Replace("\r", "").Replace("\n", "");
@@ -1073,16 +1325,22 @@ namespace CligenceCellIDGrabber
                         serialWrite(c3);//);
                         Thread.Sleep(4000);
                     }
+
                     if (Countok >= 1 && Countok < 3)
+                    {
+                        serialWrite(c4);//);
+                        Thread.Sleep(4000);
+                    }
+
+                    if (Countok >= 3 && Countok < 5)
                     {
                         serialWrite("AT+QSCAN=2,1");//);
                         Thread.Sleep(10000);
                     }
-                    if (Countok > 2 && Countok < 5)
+                    if (Countok > 4 && Countok < 8)
                     {
                         serialWrite("AT+QSCAN=3,1"); Thread.Sleep(5000);
                     }
-
                 }
                 else
                 {
@@ -1091,12 +1349,18 @@ namespace CligenceCellIDGrabber
                         serialWrite(c3);//);
                         Thread.Sleep(4000);
                     }
-                    if ((Countok >= 1 || Countok < 1) && Countok <= 3)
+                    if (Countok >= 1 && Countok < 2)
+                    {
+                        serialWrite(c4);//);
+                        Thread.Sleep(3000);
+                    }
+
+                    if (Countok >= 2 && Countok < 4)
                     {
                         serialWrite(c1);
                         Thread.Sleep(4000);
                     }
-                    if (Countok > 3 && Countok <= 5)
+                    if (Countok > 3 && Countok <= 6)
                     {
                         serialWrite(c2);
                         Thread.Sleep(4000);
@@ -1107,202 +1371,401 @@ namespace CligenceCellIDGrabber
                         MessageBox.Show("Device is not connected.Scan will stop");
                         return;
                     }
-                    if (Countok > 5 && Countok < 11)
+                    if (Countok > 6 && Countok < 12)
                     {
-                        if (Countok <= 6)
+                        if (Countok <= 7)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[0]); Thread.Sleep(2000);
                         }
-                        if (Countok > 6 && Countok <= 8)
+                        if (Countok > 7 && Countok <= 9)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 8 && Countok < 11)
+                        if (Countok > 9 && Countok < 12)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
-
                     }
-                    if (Countok > 10 && Countok < 16)
+                    if (Countok > 11 && Countok < 17)
                     {
-                        if (Countok <= 11)
+                        if (Countok <= 12)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[1]); Thread.Sleep(2000);
                         }
-                        if (Countok > 11 && Countok <= 13)
+                        if (Countok > 12 && Countok <= 14)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 13 && Countok < 16)
+                        if (Countok > 14 && Countok < 17)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok > 15 && Countok < 21)
+                    if (Countok > 16 && Countok < 22)
                     {
-                        if (Countok <= 16)
+                        if (Countok <= 17)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[2]); Thread.Sleep(2000);
                         }
-                        if (Countok > 16 && Countok <= 18)
+                        if (Countok > 17 && Countok <= 19)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 18 && Countok < 21)
+                        if (Countok > 19 && Countok < 22)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok > 20 && Countok < 26)
+                    if (Countok > 21 && Countok < 27)
                     {
-                        if (Countok <= 21)
+                        if (Countok <= 22)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[3]); Thread.Sleep(2000);
                         }
-                        if (Countok > 21 && Countok <= 23)
+                        if (Countok > 22 && Countok <= 24)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 23 && Countok < 26)
+                        if (Countok > 24 && Countok < 27)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok > 25 && Countok < 31)
+                    if (Countok > 26 && Countok < 32)
                     {
-                        if (Countok <= 26)
+                        if (Countok <= 27)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[4]); Thread.Sleep(2000);
                         }
-                        if (Countok > 26 && Countok <= 28)
+                        if (Countok > 27 && Countok <= 29)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 28 && Countok < 31)
+                        if (Countok > 29 && Countok < 32)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok > 30 && Countok < 36)
+                    if (Countok > 31 && Countok < 37)
                     {
-                        if (Countok <= 31)
+                        if (Countok <= 32)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[5]); Thread.Sleep(2000);
                         }
-                        if (Countok > 31 && Countok <= 34)
+                        if (Countok > 32 && Countok <= 35)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 34 && Countok < 37)
+                        if (Countok > 35 && Countok < 38)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok > 36 && Countok < 42)
+                    if (Countok > 37 && Countok < 43)
                     {
-                        if (Countok <= 37)
+                        if (Countok <= 38)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[6]); Thread.Sleep(2000);
                         }
-                        if (Countok > 37 && Countok <= 39)
+                        if (Countok > 38 && Countok <= 40)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 39 && Countok < 42)
+                        if (Countok > 40 && Countok < 43)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
-
                     }
-                    if (Countok > 41 && Countok < 47)
+                    if (Countok > 42 && Countok < 48)
                     {
-                        if (Countok <= 42)
+                        if (Countok <= 43)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[7]); Thread.Sleep(2000);
                         }
-                        if (Countok > 42 && Countok <= 44)
+                        if (Countok > 43 && Countok <= 45)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 44 && Countok < 47)
+                        if (Countok > 45 && Countok < 48)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok > 46 && Countok < 52)
+                    if (Countok > 47 && Countok < 53)
                     {
-                        if (Countok <= 47)
+                        if (Countok <= 48)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[8]); Thread.Sleep(2000);
                         }
-                        if (Countok > 47 && Countok <= 49)
+                        if (Countok > 48 && Countok <= 50)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 49 && Countok < 52)
+                        if (Countok > 50 && Countok < 53)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
-
                     }
-                    if (Countok > 51 && Countok < 57)
+                    if (Countok > 52 && Countok < 58)
                     {
-                        if (Countok <= 52)
+                        if (Countok <= 53)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[9]); Thread.Sleep(2000);
                         }
-                        if (Countok > 52 && Countok <= 54)
+                        if (Countok > 53 && Countok <= 55)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 54 && Countok < 57)
+                        if (Countok > 55 && Countok < 58)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok > 56 && Countok < 62)
+                    if (Countok > 57 && Countok < 63)
                     {
-                        if (Countok <= 57)
+                        if (Countok <= 58)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[10]); Thread.Sleep(2000);
                         }
-                        if (Countok > 57 && Countok <= 59)
+                        if (Countok > 58 && Countok <= 60)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 59 && Countok < 62)
+                        if (Countok > 60 && Countok < 63)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok > 61 && Countok < 67)
+                    if (Countok > 62 && Countok < 68)
                     {
 
-                        if (Countok <= 62)
+
+                        if (Countok <= 63)
                         {
                             serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[11]); Thread.Sleep(2000);
                         }
-                        if (Countok > 62 && Countok <= 64)
+                        if (Countok > 63 && Countok <= 65)
                         {
                             serialWrite(c1); Thread.Sleep(4000);
                         }
-                        if (Countok > 64 && Countok < 67)
+                        if (Countok > 65 && Countok < 68)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+                    }
+                    //for add new command
+                    if (Countok > 67 && Countok < 73)
+                    {
+                        if (Countok <= 67)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[0]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 68 && Countok <= 70)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 69 && Countok < 72)
                         {
                             serialWrite(c2); Thread.Sleep(4000);
                         }
 
                     }
-                    if (Countok >= 66 && Countok < 68)
+                    if (Countok > 71 && Countok < 78)
+                    {
+                        if (Countok <= 72)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[1]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 72 && Countok <= 74)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 74 && Countok < 77)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+                    if (Countok > 76 && Countok < 82)
+                    {
+                        if (Countok <= 77)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[2]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 77 && Countok <= 79)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 79 && Countok < 82)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+                    if (Countok > 81 && Countok < 87)
+                    {
+                        if (Countok <= 82)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[3]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 82 && Countok <= 84)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 84 && Countok < 87)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+                    if (Countok > 86 && Countok < 92)
+                    {
+                        if (Countok <= 87)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[4]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 87 && Countok <= 89)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 89 && Countok < 92)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+                    if (Countok > 91 && Countok < 97)
+                    {
+                        if (Countok <= 92)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[5]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 92 && Countok <= 95)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 95 && Countok < 98)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+                    if (Countok > 97 && Countok < 103)
+                    {
+                        if (Countok <= 98)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[6]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 98 && Countok <= 100)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 100 && Countok < 103)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 102 && Countok < 108)
+                    {
+                        if (Countok <= 103)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[7]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 103 && Countok <= 105)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 105 && Countok < 108)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+                    if (Countok > 107 && Countok < 113)
+                    {
+                        if (Countok <= 108)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[8]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 108 && Countok <= 110)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 110 && Countok < 113)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 112 && Countok < 118)
+                    {
+                        if (Countok <= 113)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[9]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 113 && Countok <= 115)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 115 && Countok < 118)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+                    if (Countok > 117 && Countok < 123)
+                    {
+                        if (Countok <= 118)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[10]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 118 && Countok <= 120)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 120 && Countok < 123)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+                    if (Countok > 122 && Countok < 128)
+                    {
+
+
+                        if (Countok <= 123)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[11]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 123 && Countok <= 125)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 125 && Countok < 128)
+                        {
+                            serialWrite(c2); Thread.Sleep(4000);
+                        }
+
+                    }
+
+
+                    //for add new command
+                    if (Countok >= 127 && Countok < 129)
                     {
                         serialWrite(c3);
+                        Thread.Sleep(1000);
+                    }
+
+                    if (Countok >= 128 && Countok < 130)
+                    {
+                        serialWrite(c4);
                         Thread.Sleep(1000);
                     }
                 }
@@ -1327,6 +1790,7 @@ namespace CligenceCellIDGrabber
                 string c1 = ("AT+QSCAN=2,1").
                   Replace("\r", "").Replace("\n", "");
                 string c3 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                string c3n = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
 
                 // outputFile = @"C:\amar\2goutput.txt";
                 //await Task.Run(() => 
@@ -1344,20 +1808,27 @@ namespace CligenceCellIDGrabber
                         serialWrite(c3);//);
                         Thread.Sleep(2000);
                     }
-                    if (Countok >= 2 && Countok < 5)
+
+                    if (Countok >= 2 && Countok <= 4)
+                    {
+
+                        serialWrite(c3n);//);
+                        Thread.Sleep(2000);
+                    }
+                    if (Countok >= 4 && Countok < 7)
                     {
 
                         serialWrite("AT+QSCAN=1,1");//);
                         Thread.Sleep(5000);
                     }
 
-                    if (Countok > 4 && Countok < 7)
+                    if (Countok > 6 && Countok < 9)
                     {
                         serialWrite("AT+QSCAN=2,1");//);
                         Thread.Sleep(10000);
                     }
 
-                    if (Countok > 6 && Countok < 9)
+                    if (Countok > 8 && Countok < 11)
                     {
                         serialWrite("AT+QSCAN=3,1");
                         Thread.Sleep(10000);
@@ -1377,22 +1848,29 @@ namespace CligenceCellIDGrabber
                         Thread.Sleep(2000);
                     }
                     string c4 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
-                    if ((Countok >= 1 || Countok < 1) && Countok < 2)
+                    string c4n = (@"AT+QNWPREFCFG =  ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                    if (Countok < 2)
                     {
                         serialWrite(c4);//);
                         Thread.Sleep(2000);
                     }
+
                     if (Countok >= 2 && Countok < 4)
+                    {
+                        serialWrite(c4n);//);
+                        Thread.Sleep(2000);
+                    }
+                    if (Countok > 3 && Countok < 5)
                     {
                         serialWrite("AT+QSCAN=1,1");//);
                         Thread.Sleep(4000);
                     }
-                    if (Countok >= 4 && Countok < 6)
+                    if (Countok >= 5 && Countok < 7)
                     {
                         serialWrite(c1);//);
-                        Thread.Sleep(4000); serialWrite(c1);//);
+                        Thread.Sleep(4000);
                     }
-                    if (Countok >= 6 && Countok < 8)
+                    if (Countok > 6 && Countok < 8)
                     {
                         serialWrite("AT+QSCAN=3,1");
                         Thread.Sleep(4000);
@@ -1683,17 +2161,210 @@ namespace CligenceCellIDGrabber
                             serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
                         }
                     }
-                    if (Countok > 99 && Countok < 101)
+                    //add new band for 5g 
+                    if (Countok > 99 && Countok < 105)
+                    {
+                        if (Countok <= 100)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[0]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 100 && Countok < 103)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 102 && Countok < 105)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 104 && Countok < 110)
+                    {
+                        if (Countok <= 105)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[1]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 105 && Countok < 108)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 107 && Countok < 110)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 109 && Countok < 115)
+                    {
+                        if (Countok <= 110)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[2]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 110 && Countok < 113)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 112 && Countok < 115)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 114 && Countok < 112)
+                    {
+                        if (Countok <= 115)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[3]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 115 && Countok < 118)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 117 && Countok < 120)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 119 && Countok < 125)
+                    {
+                        if (Countok <= 120)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[4]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 120 && Countok < 123)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 122 && Countok < 125)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 124 && Countok < 130)
+                    {
+                        if (Countok <= 125)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[5]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 125 && Countok < 128)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 127 && Countok < 130)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 129 && Countok < 135)
+                    {
+                        if (Countok <= 130)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[6]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 130 && Countok < 133)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 132 && Countok < 135)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 134 && Countok < 140)
+                    {
+                        if (Countok <= 135)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[7]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 135 && Countok < 138)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 137 && Countok < 140)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 139 && Countok < 145)
+                    {
+                        if (Countok <= 140)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[8]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 140 && Countok < 143)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 142 && Countok < 145)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 144 && Countok < 150)
+                    {
+                        if (Countok <= 145)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[9]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 145 && Countok < 148)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 147 && Countok < 150)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 149 && Countok < 155)
+                    {
+                        if (Countok <= 150)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[10]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 150 && Countok < 153)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok >= 152 && Countok < 155)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+                    if (Countok > 154 && Countok < 160)
+                    {
+                        if (Countok <= 155)
+                        {
+                            serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[11]); Thread.Sleep(2000);
+                        }
+                        if (Countok > 155 && Countok < 158)
+                        {
+                            serialWrite(c1); Thread.Sleep(4000);
+                        }
+                        if (Countok > 157 && Countok < 160)
+                        {
+                            serialWrite("AT+QSCAN=3,1"); Thread.Sleep(4000);
+                        }
+                    }
+
+
+
+
+
+
+
+                    //add new band for 5g
+                    if (Countok > 159 && Countok < 161)
                     {
                         serialWrite(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71");
                         Thread.Sleep(2000);
                     }
-                    if (Countok > 100 && Countok < 102)
+                    if (Countok > 160 && Countok < 162)
                     {
                         serialWrite(c4);//);
                         Thread.Sleep(2000);
                     }
-
+                    if (Countok > 161 && Countok < 163)
+                    {
+                        serialWrite(c4n);//);
+                        Thread.Sleep(2000);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1703,15 +2374,17 @@ namespace CligenceCellIDGrabber
 
         }
 
-        private void btnStop_Click(object sender, EventArgs e)
+        private async void btnStop_Click(object sender, EventArgs e)
         {
             //progressbar(0);
             // watcher.Stop();
+            //_cancellationTokenSource.Cancel();
             if (selectedMode.ToString().ToLower() == "route")
             {
                 try
                 {
-                    lockk = false; serialPort2.Close();// Thread.Sleep(3000);
+                    lockk = false;
+                    await Task.Run(() => serialPort2.Close());// Thread.Sleep(3000);
                     Thread.Sleep(1000);
                     // serialPort2.Close();
                     //serialPort2.Open();
@@ -1743,7 +2416,8 @@ namespace CligenceCellIDGrabber
                     btnConnect.Visible = true;
                     try
                     {
-                        serialPort2.Close();
+                        await Task.Run(() => serialPort2.Close());
+
                         // scannedCellId.Clear();
                         // dt.Clear();
 
@@ -1908,7 +2582,38 @@ namespace CligenceCellIDGrabber
             //if(serialPort2.IsOpen)
             //serialPort2.Write("AT+cnsvs"+Environment.NewLine);           
         }
+        private static bool IsPortHiddenOrUnused(string portName)
+        {
+            try
+            {
+                using (var port = new SerialPort(portName))
+                {
+                    // Try to open the port
+                    port.Open();
 
+                    // If successfully opened, it's not hidden or unused
+                    port.Close();
+                    return false;
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Port is in use
+                return true;
+            }
+            catch (IOException)
+            {
+                // Port is hidden or doesn't exist
+                return true;
+            }
+        }
+
+        private static bool IsATPort(string portName)
+        {
+            // You can adjust this condition based on the naming convention
+            // or other characteristics of AT Ports on your system
+            return portName.ToLower().Contains("at");
+        }
         public bool establishConnection()
         {
             try
@@ -1916,22 +2621,26 @@ namespace CligenceCellIDGrabber
                 serialPort2.DtrEnable = true;
                 serialPort2.RtsEnable = true;
                 string[] ports = SerialPort.GetPortNames();
+                // ports = ports.Where(port => IsATPort(port)).ToArray();
+
+                // Filter out hidden or unused ports
+                //ports = ports.Where(port => !IsPortHiddenOrUnused(port)).ToArray();
                 //for (int h = 0; h < ports.Length; h++)
                 //{
                 try
                 {
-                    
-                  // SerialPort port = new SerialPort(ports[0].Trim(), 115200, Parity.None, 8, StopBits.One);
-                    //SerialPort port = new SerialPort(serialPort2.PortName.Trim(), 115200);
+
+                    // SerialPort port = new SerialPort(ports[0].Trim(), 115200, Parity.None, 8, StopBits.One);
+                    SerialPort port = new SerialPort(serialPort2.PortName.Trim(), 115200);
                     //SerialPort port = new SerialPort(ports[0]);
                     //if (serialPort2.PortName.Trim() == port.PortName.Trim())
                     //{
                     //     port = new SerialPort(ports[1]);
                     //}
                     //port.DtrEnable = true;
-                   //// port.RtsEnable = true;
+                    //// port.RtsEnable = true;
                     Thread.Sleep(2000);
-                   // port.Open();
+                    port.Open();
                 }
                 catch (Exception ex)
                 {
@@ -1939,7 +2648,6 @@ namespace CligenceCellIDGrabber
                     //port.Open();
 
                 }
-
                 //SerialPort port4 = new SerialPort(ports[4]);
                 //// SerialPort port = new SerialPort(ports[0], 9600, Parity.Even, 8, StopBits.One);
                 ////SerialPort port = new SerialPort(ports[0], 115200);
@@ -1954,7 +2662,7 @@ namespace CligenceCellIDGrabber
                 try
                 {
                     serialPort2.Close();
-                   // serialPort2.Dispose();
+                    // serialPort2.Dispose();
                     Thread.Sleep(2000);
                     serialPort2.Open();
                     Thread.Sleep(2000);
@@ -2035,7 +2743,7 @@ namespace CligenceCellIDGrabber
             //});
             metroComboBox1.Invoke((MethodInvoker)delegate
             {
-                //if(DdlMode.SelectedItem.ToString()=="Route")
+                //if(DdlMode.SelectedItem.ToString()=="Route")freceiv
                 metroComboBox1.Enabled = false;
             });
             DdlMode.Invoke((MethodInvoker)delegate
@@ -2116,6 +2824,29 @@ namespace CligenceCellIDGrabber
                         {
                             row["CGI"] = map["mcc"] + "-" + map["mnc"] + "-" + row["LAC/TAC"] + "-" + (Convert.ToInt32(map["cellid"], 16));
                         }
+                        try
+                        {
+                            if (map["net"] == "4G" && row["Operator Name"].ToString().ToLower() == "airtel")
+                            {
+                                //row["ENB"] = Convert.ToInt32(map["cellid"], 16) / 256;
+                                //string hexcell = map["cellid"].ToString().Substring(map["cellid"].Length - 2, 2);
+                                //row["ECI"] = (row["ENB"] + "" + Reverse(hexcell)).Replace("-", "");
+
+                                //new formula
+                                string id = map["cellid"].ToString().Substring(map["cellid"].Length - 2, 2);
+                                row["ECI"] = (Convert.ToInt32(map["cellid"], 16) / 256).ToString() + "" + Convert.ToInt32(id, 16).ToString();
+                                row["CGI"] = map["mcc"] + "-" + map["mnc"] + "-" + row["LAC/TAC"] + "-" + (Convert.ToInt32(map["cellid"], 16));
+                            }
+                            if (map["net"] == "4G" && row["Operator Name"].ToString().ToLower().Contains( "vodafone"))
+                            {
+                                // eci = enb + (hex cell id --> last 2 digits-- > convert to int) for Vodafone
+                                row["ENB"] = Convert.ToInt32(map["cellid"], 16) / 256;
+                                string id = map["cellid"].ToString().Substring(map["cellid"].Length - 2, 2);
+                                row["ECI"] = (Convert.ToInt32(map["cellid"], 16) / 256).ToString() + "" + Convert.ToInt32(id, 16).ToString();
+                                row["CGI"] = map["mcc"] + "-" + map["mnc"] + "-"  + row["ECI"];
+                            }
+                        }
+                        catch(Exception ex) { }
                     }
                     else
                     {
@@ -2131,8 +2862,11 @@ namespace CligenceCellIDGrabber
                         }
                         if (map["net"] == "4G")
                         {
-                            if (row["CGI"].ToString().Replace("-", "").Length < 13)
+                            if (row["CGI"].ToString().Replace("-", "").Length == 12)
                                 row["CGI"] = map["mcc"] + "-" + map["mnc"] + "-" + "0" + map["cellid"];
+
+                            if (row["CGI"].ToString().Replace("-", "").Length == 11)
+                                row["CGI"] = map["mcc"] + "-" + map["mnc"] + "-" + "00" + map["cellid"];
                         }
                     }
                     row["(A/E/U)RFCN"] = map["arfcn"];
@@ -2172,10 +2906,10 @@ namespace CligenceCellIDGrabber
                 {
                     if (a.Contains("5G") && !a.Contains("4G + 5G"))
                     {
-                        progressbar(2);
+                        progressbar(1);
                         scan5GNetwork(Countok);
 
-                        if (Countok > 68)
+                        if (Countok > 130)
                         {
                             //if (this.loader.Visible)
                             //{
@@ -2186,7 +2920,14 @@ namespace CligenceCellIDGrabber
                                 loader.Visible = false;
                             });
                             MessageBox.Show("Scan Completed");
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
 
+                            });
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
@@ -2199,8 +2940,11 @@ namespace CligenceCellIDGrabber
                     else if (a.Contains("4G") && !a.Contains("4G + 5G"))
                     {
                         scan4GNetwork(Countok);
-                        progressbar(3);
-                        if (Countok > 38)
+                        if (Countok <= 34)
+                        {
+                            progressbar(3);
+                        }
+                        if (Countok >= 38 && Countok<39)
                         {
                             //if (this.loader.Visible)
                             //{
@@ -2211,6 +2955,14 @@ namespace CligenceCellIDGrabber
                                 loader.Visible = false;
                             });
                             MessageBox.Show("Scan Completed");
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
+
+                            });
                             // serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
@@ -2224,7 +2976,7 @@ namespace CligenceCellIDGrabber
                     {
                         scan4G5GNetwork(Countok);
                         progressbar(1);
-                        if (Countok > 103)
+                        if (Countok >= 163)
                         {
                             //if (this.loader.Visible)
                             //{
@@ -2235,7 +2987,14 @@ namespace CligenceCellIDGrabber
                                 loader.Visible = false;
                             });
                             MessageBox.Show("Scan Completed");
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
 
+                            });
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
@@ -2259,9 +3018,25 @@ namespace CligenceCellIDGrabber
                             {
                                 loader.Visible = false;
                             });
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
+
+                            });
                             MessageBox.Show("Scan Completed");
                             //MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
+
+                            });
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
                             btnStart.Invoke((MethodInvoker)delegate { btnStart.Visible = true; });
@@ -2274,7 +3049,7 @@ namespace CligenceCellIDGrabber
                     {
                         progressbar(1);
                         scanAllForFast(Countok);
-                        if (Countok >= 105)
+                        if (Countok >= 198)
                         {
                             //if (this.loader.Visible)
                             //{
@@ -2285,6 +3060,14 @@ namespace CligenceCellIDGrabber
                                 loader.Visible = false;
                             });
                             MessageBox.Show("Scan Completed");
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
+
+                            });
                             //MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -2294,7 +3077,6 @@ namespace CligenceCellIDGrabber
                             cmbMode.Invoke((MethodInvoker)delegate { cmbMode.Enabled = true; });
                             metroComboBox1.Invoke((MethodInvoker)delegate { metroComboBox1.Enabled = true; });
                         }
-
                     }
                 }
 
@@ -2302,7 +3084,6 @@ namespace CligenceCellIDGrabber
                 else if (dataRec.ToLower().Contains("ok") && (selectedMode.ToLower().Contains("spot") || selectedMode.ToLower().Contains("route"))
            && selectedcmbMode.ToLower().Contains("fast") && (dataRec.ToLower().Contains("ok") || dataRec.ToLower().Contains("error")) && (selectedMode.ToLower().Contains("spot")) || selectedMode.ToLower().Contains("route"))
                 {
-
                     if (a.Contains("5G") && !a.Contains("4G + 5G"))
                     {
                         progressbar(25);
@@ -2319,6 +3100,14 @@ namespace CligenceCellIDGrabber
                                 loader.Visible = false;
                             });
                             MessageBox.Show("Scan Completed");
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
+
+                            });
                             //MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
@@ -2327,7 +3116,6 @@ namespace CligenceCellIDGrabber
                             DdlMode.Invoke((MethodInvoker)delegate { DdlMode.Enabled = true; });
                             cmbMode.Invoke((MethodInvoker)delegate { cmbMode.Enabled = true; });
                             metroComboBox1.Invoke((MethodInvoker)delegate { metroComboBox1.Enabled = true; });
-
                         }
                     }
                     else if (a.Contains("4G") && !a.Contains("4G + 5G"))
@@ -2348,6 +3136,14 @@ namespace CligenceCellIDGrabber
                             MessageBox.Show("Scan Completed");
                             // MessageBox.Show("Scan Completed");
                             //serialPort2.Close();
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
+
+                            });
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
                             btnStart.Invoke((MethodInvoker)delegate { btnStart.Visible = true; });
@@ -2358,7 +3154,7 @@ namespace CligenceCellIDGrabber
                     }
                     else if (a.Contains("4G + 5G"))
                     {
-                        progressbar(11);
+                        progressbar(10);
                         scan4G5GNetwork(Countok);
 
                         if (Countok >= 9 && !selectedMode.ToLower().Contains("route"))
@@ -2372,6 +3168,14 @@ namespace CligenceCellIDGrabber
                                 loader.Visible = false;
                             });
                             MessageBox.Show("Scan Completed");
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
+
+                            });
                             // serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
@@ -2421,6 +3225,14 @@ namespace CligenceCellIDGrabber
                                 loader.Visible = false;
                             });
                             MessageBox.Show("Scan Completed");
+                            Progrsbr.Invoke((MethodInvoker)delegate
+                            {
+                                // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+                                Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                                Progrsbr.Value = Progrsbr.Minimum;
+                                Progrsbr.Value = 0;
+
+                            });
                             //serialPort2.Close();
                             btnStop.Invoke((MethodInvoker)delegate { btnStop.Visible = false; });
                             btnSave.Invoke((MethodInvoker)delegate { btnSave.Visible = true; });
@@ -3181,8 +3993,6 @@ namespace CligenceCellIDGrabber
                     //changes for portfind
                     string subport = portText.Substring(portText.LastIndexOf('(') + 1, portText.LastIndexOf(')'));
                     port = subport.Replace(")", "");
-
-
                     serialPort2.PortName = port.Trim();
                     serialPort2.BaudRate = 115200;
                     Thread.Sleep(1000);
@@ -3301,12 +4111,13 @@ namespace CligenceCellIDGrabber
                         DataTable tblFilteredJio = new DataTable();
                         DataTable tblFilteredAirtel = new DataTable();
                         DataTable tblFilteredVodafoneIdea = new DataTable();
+                        DataTable tblFilteredCellone = new DataTable();
                         DataTable tblother = new DataTable();
                         DataTable tblAll = new DataTable();
                         DataSet ds = new DataSet();
                         tblAll = dt.AsEnumerable().CopyToDataTable();
                         ds.Tables.Add(tblAll);
-                        string[] tabName = { "All", "Jio", "Airtel", "Vodafone Idea", "Other" };
+                        string[] tabName = { "All", "Jio", "Airtel", "Vodafone Idea","Cellone", "Other" };
                         try
                         {
                             tblFilteredJio = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Jio").CopyToDataTable();
@@ -3336,10 +4147,20 @@ namespace CligenceCellIDGrabber
                         }
                         try
                         {
+                            tblFilteredCellone = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Cellone").CopyToDataTable();
+                            ds.Tables.Add(tblFilteredCellone);
+                        }
+                        catch (Exception ex)
+                        {
+                            ds.Tables.Add(tblFilteredCellone);
+                        }
+                        try
+                        {
                             tblother = dt.AsEnumerable()
                                    .Where(r => r.Field<string>("Operator Name") != "Airtel")
                                    .Where(r => r.Field<string>("Operator Name") != "Jio")
                                    .Where(x => x.Field<string>("Operator Name") != "Vodafone Idea")
+                                   .Where(x => x.Field<string>("Operator Name") != "Cellone")
                                    .CopyToDataTable();
                             ds.Tables.Add(tblother);
                         }
@@ -3387,9 +4208,10 @@ namespace CligenceCellIDGrabber
         #region MyRegion
         public string GetfileData()
         {
+            string filepath = "";
 
             var dir = @"C:\CligenceExcel";  // folder location
-            string filepath = "C:\\CligenceExcel\\" + DateTime.Now.ToString("yyyyMMdd_hhmmss") + "-CligenceExcelReport" + ".xlsx";
+             filepath = "C:\\CligenceExcel\\" + DateTime.Now.ToString("yyyyMMdd_hhmmss") + "-CligenceExcelReport" + ".xlsx";
 
             // folder location
             //  var directoryInfo = new DirectoryInfo("C:\\Sys\\");
@@ -3408,7 +4230,9 @@ namespace CligenceCellIDGrabber
                 }
             }
 
-            return filepath;
+                return  filepath;
+
+
 
         }
         #endregion
@@ -3469,7 +4293,8 @@ namespace CligenceCellIDGrabber
                 Progrsbr.Invoke((MethodInvoker)delegate
                 {
                     // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
-
+                    Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
+                    Progrsbr.Value = Progrsbr.Minimum;
                     Progrsbr.Value = 0;
 
                 });
@@ -3519,6 +4344,38 @@ namespace CligenceCellIDGrabber
             MessageBox.Show("Error received: " + e.EventType);
 
 
+        }
+
+        private void metroGrid1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+
+                try
+                {
+                    string data = GetSelectedCellsData(metroGrid1);
+                    Clipboard.SetText(data);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error copying data: " + ex.Message);
+                }
+            }
+        }
+        private string GetSelectedCellsData(MetroFramework.Controls.MetroGrid grid)
+        {
+            // Customize this to suit your needs
+            var selectedCells = grid.SelectedCells;
+            string clipboardData = "";
+
+            foreach (DataGridViewCell cell in selectedCells)
+            {
+                clipboardData += cell.Value?.ToString() + "\t"; // Tab-separated values
+            }
+
+            return clipboardData;
         }
         #region SerialportTask
         static void USBDeviceChangeHandler(object sender, EventArrivedEventArgs e)
