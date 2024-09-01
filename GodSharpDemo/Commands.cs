@@ -50,6 +50,7 @@ namespace CligenceCellIDGrabber
         bool MachineType;
         string selectedcmbMode;
         int Countok = 0;
+        bool isRowClicked = false;
         System.Management.ManagementEventWatcher watcher;
         public Commands()
         {
@@ -315,6 +316,7 @@ namespace CligenceCellIDGrabber
             loader.Invoke((MethodInvoker)delegate
             {
                 loader.Visible = true;
+
             });
 
             //btnStart.Invoke((MethodInvoker)delegate
@@ -461,7 +463,23 @@ namespace CligenceCellIDGrabber
         }
 
         //for ALL 
-        protected void scanAllForFast(int count = 0)
+        private async void scanAllForFast(int count = 0)
+        {
+            try
+            {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
+                await RunAsyncforAll(Countok);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        protected void scanAllForFastold(int count = 0)
         {
             net = "ALL";
             //outputFile = @"C:\amar\2goutput.txt";
@@ -1080,7 +1098,23 @@ namespace CligenceCellIDGrabber
         }
 
         //for 3G
-        protected void scan3GNetwork(int count = 0)
+        private async void scan3GNetwork(int count = 0)
+        {
+            try
+            {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
+                await RunAsync3g(Countok);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        protected void scan3GNetworkold(int count = 0)
         {
             try
             {
@@ -1125,7 +1159,24 @@ namespace CligenceCellIDGrabber
             }
         }
         //for 4G
-        private void scan4GNetwork(int count = 0)
+
+        private async void scan4GNetwork(int count = 0)
+        {
+            try
+            {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
+                await RunAsync4g(Countok);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        private void scan4GNetworkold(int count = 0)
         {
             try
             {
@@ -1140,6 +1191,7 @@ namespace CligenceCellIDGrabber
                 //await Task.Run(() => 
                 if ((selectedcmbMode) == "Fast")
                 {
+
                     if (Countok < 1 && Countok < 2)
                     {
                         serialWrite(@"AT+QNWPREFCFG= ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71");//);
@@ -1298,7 +1350,23 @@ namespace CligenceCellIDGrabber
             }
         }
         //for 5G
-        protected void scan5GNetwork(int count = 0)
+        private async void scan5GNetwork(int count = 0)
+        {
+            try
+            {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
+                await RunAsync5g(Countok);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        protected void scan5GNetworkold(int count = 0)
         {
             try
             {
@@ -1775,8 +1843,24 @@ namespace CligenceCellIDGrabber
 
             }
         }
+        #region 4G5GNetwork
+        private async void scan4G5GNetwork(int count = 0)
+        {
+            try
+            {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
+                await RunAsyncfor4G5G(Countok);
+            }
+            catch (Exception ex)
+            {
 
-        private void scan4G5GNetwork(int count = 0)
+            }
+        }
+        private void scan4G5GNetworkold(int count = 0)
         {
             try
             {
@@ -2343,12 +2427,6 @@ namespace CligenceCellIDGrabber
                         }
                     }
 
-
-
-
-
-
-
                     //add new band for 5g
                     if (Countok > 159 && Countok < 161)
                     {
@@ -2373,7 +2451,7 @@ namespace CligenceCellIDGrabber
             }
 
         }
-
+        #endregion
         private async void btnStop_Click(object sender, EventArgs e)
         {
             //progressbar(0);
@@ -2837,16 +2915,16 @@ namespace CligenceCellIDGrabber
                                 row["ECI"] = (Convert.ToInt32(map["cellid"], 16) / 256).ToString() + "" + Convert.ToInt32(id, 16).ToString();
                                 row["CGI"] = map["mcc"] + "-" + map["mnc"] + "-" + row["LAC/TAC"] + "-" + (Convert.ToInt32(map["cellid"], 16));
                             }
-                            if (map["net"] == "4G" && row["Operator Name"].ToString().ToLower().Contains( "vodafone"))
+                            if (map["net"] == "4G" && row["Operator Name"].ToString().ToLower().Contains("vodafone"))
                             {
                                 // eci = enb + (hex cell id --> last 2 digits-- > convert to int) for Vodafone
                                 row["ENB"] = Convert.ToInt32(map["cellid"], 16) / 256;
                                 string id = map["cellid"].ToString().Substring(map["cellid"].Length - 2, 2);
                                 row["ECI"] = (Convert.ToInt32(map["cellid"], 16) / 256).ToString() + "" + Convert.ToInt32(id, 16).ToString();
-                                row["CGI"] = map["mcc"] + "-" + map["mnc"] + "-"  + row["ECI"];
+                                row["CGI"] = map["mcc"] + "-" + map["mnc"] + "-" + row["ECI"];
                             }
                         }
-                        catch(Exception ex) { }
+                        catch (Exception ex) { }
                     }
                     else
                     {
@@ -2890,6 +2968,8 @@ namespace CligenceCellIDGrabber
                         //metroGrid1.ReadOnly = true;
                         //metroGrid1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
                         //metroGrid1.ColumnHeadersDefaultCellStyle.Font = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold);
+                        //  metroGrid1.CellMouseClick += new DataGridViewCellMouseEventHandler(this.dgv_CellMouseClick);
+
                         metroGrid1.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgv_RowPostPaint);
                         metroGrid1.DataSource = dt;
 
@@ -2944,7 +3024,7 @@ namespace CligenceCellIDGrabber
                         {
                             progressbar(3);
                         }
-                        if (Countok >= 38 && Countok<39)
+                        if (Countok >= 38 && Countok < 39)
                         {
                             //if (this.loader.Visible)
                             //{
@@ -3047,9 +3127,10 @@ namespace CligenceCellIDGrabber
                     }
                     else
                     {
+                       
                         progressbar(1);
                         scanAllForFast(Countok);
-                        if (Countok >= 198)
+                        if (Countok >= 168)
                         {
                             //if (this.loader.Visible)
                             //{
@@ -3263,6 +3344,47 @@ namespace CligenceCellIDGrabber
                 });
             }
         }
+        public void progressbarwrong(decimal increment)
+        {
+            if (this.Progrsbr.Visible)
+            {
+                Progrsbr.Invoke((MethodInvoker)delegate
+                {
+                    // Calculate the integer increment based on the decimal value
+                    int intIncrement = (int)Math.Round(increment);
+
+                    // Safely adjust the progress bar value
+                    int newValue = Progrsbr.Value + intIncrement;
+                    if (newValue >= Progrsbr.Maximum)
+                    {
+                        Progrsbr.Value = Progrsbr.Maximum;
+                    }
+                    else if (newValue <= Progrsbr.Minimum)
+                    {
+                        Progrsbr.Value = Progrsbr.Minimum;
+                    }
+                    else
+                    {
+                        Progrsbr.Value = newValue;
+                    }
+
+                    // Calculate the percentage
+                    int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) /
+                        (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
+
+                    // Draw the percentage string
+                    using (Graphics graphics = Progrsbr.CreateGraphics())
+                    {
+                        string percentageText = per.ToString() + "%";
+                        SizeF textSize = graphics.MeasureString(percentageText, SystemFonts.DefaultFont);
+                        PointF location = new PointF(Progrsbr.Width / 2 - textSize.Width / 2.0F,
+                                                     Progrsbr.Height / 2 - textSize.Height / 2.0F);
+
+                        graphics.DrawString(percentageText, SystemFonts.DefaultFont, Brushes.Black, location);
+                    }
+                });
+            }
+        }
 
 
         public void progressbar(int increment)
@@ -3274,30 +3396,61 @@ namespace CligenceCellIDGrabber
                     this.Progrsbr.Increment(increment);
                     int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) /
                         (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
-                    using (Graphics graphics = Progrsbr.CreateGraphics())
-                    {
-                        graphics.DrawString(per.ToString() + "%", SystemFonts.DefaultFont, Brushes.Black,
-                            new PointF(Progrsbr.Width / 2 - (graphics.MeasureString(per.ToString() + "%",
-                            SystemFonts.DefaultFont).Width / 2.0F),
-                            Progrsbr.Height / 2 - (graphics.MeasureString(per.ToString() + "%",
-                            SystemFonts.DefaultFont).Height / 2.0F)));
-                    }
+                    //if (selectedcmbMode.ToLower().Contains("deep") || selectedMode.ToLower().Contains("spot"))
+                    //{
+                    //    if (a == "ALL")
+                    //    {
+                    //        var pers = per / 2;
+                    //        using (Graphics graphics = Progrsbr.CreateGraphics())
+                    //        {
+                    //            graphics.DrawString(pers.ToString() + "%", SystemFonts.DefaultFont, Brushes.Black,
+                    //                new PointF(Progrsbr.Width / 2 - (graphics.MeasureString(pers.ToString() + "%",
+                    //                SystemFonts.DefaultFont).Width / 2.0F),
+                    //                Progrsbr.Height / 2 - (graphics.MeasureString(pers.ToString() + "%",
+                    //                SystemFonts.DefaultFont).Height / 2.0F)));
+                    //        }
+                    //    }
+                    //}
+                    //else
+                    //{
+                        using (Graphics graphics = Progrsbr.CreateGraphics())
+                        {
+                            graphics.DrawString(per.ToString() + "%", SystemFonts.DefaultFont, Brushes.Black,
+                                new PointF(Progrsbr.Width / 2 - (graphics.MeasureString(per.ToString() + "%",
+                                SystemFonts.DefaultFont).Width / 2.0F),
+                                Progrsbr.Height / 2 - (graphics.MeasureString(per.ToString() + "%",
+                                SystemFonts.DefaultFont).Height / 2.0F)));
+                        }
+                    //}
                 });
             }
         }
-        private void dgv_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        //private void dgv_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        //{
+        //    if (metroGrid1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null && !string.IsNullOrWhiteSpace(metroGrid1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString()))
+        //    {
+        //        metroGrid1.Rows[e.RowIndex].Cells[e.ColumnIndex].Style = new DataGridViewCellStyle { ForeColor = Color.White, BackColor = Color.Blue };
+        //    }
+        //    else
+        //    {
+        //        metroGrid1.Rows[e.RowIndex].Cells[e.ColumnIndex].Style = metroGrid1.DefaultCellStyle;
+        //    }
+        //}
+        private void dgv_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (metroGrid1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null && !string.IsNullOrWhiteSpace(metroGrid1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString()))
+            if (e.RowIndex >= 0)
             {
-                metroGrid1.Rows[e.RowIndex].Cells[e.ColumnIndex].Style = new DataGridViewCellStyle { ForeColor = Color.White, BackColor = Color.Blue };
-            }
-            else
-            {
-                metroGrid1.Rows[e.RowIndex].Cells[e.ColumnIndex].Style = metroGrid1.DefaultCellStyle;
+                isRowClicked = true;  // Set the flag when a row is clicked
             }
         }
+
         private void dgv_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
+            //if(loader.Visible)
+            //{
+            //    isRowClicked = false;
+            //    return;
+            //}
             try
             {
                 var grid = sender as DataGridView;
@@ -3325,342 +3478,2018 @@ namespace CligenceCellIDGrabber
             Array.Reverse(charArray);
             return new string(charArray);
         }
-        void serialWrite(string cmd)
+
+        #region Changes for deadlock
+        private async Task SendSerialCommandAsync(string command, int delayMilliseconds, CancellationToken cancellationToken)
         {
-            if (cmd != null)
-                queue.Enqueue(cmd);
-            lock (this)
+            await Task.Run(() =>
             {
-                if (lockk == false && queue.Count > 0)
+                serialWrite(command);
+
+                // Simulate a delay (replaces Thread.Sleep)
+                Task.Delay(delayMilliseconds, cancellationToken).Wait();
+               
+            }, cancellationToken);
+        }
+        #region 4G5GNetwork
+        public async Task RunAsyncfor4G5G(int Countok)
+        {
+            using (CancellationTokenSource cts = new CancellationTokenSource())
+            {
+                // Set a global timeout for the entire operation
+                cts.CancelAfter(TimeSpan.FromSeconds(30)); // e.g., 30 seconds
+
+                await ExecuteIoTCommandAsyncfor4G5G(cts.Token, Countok);
+            }
+        }
+        public async Task ExecuteIoTCommandAsyncfor4G5G(CancellationToken cancellationToken, int Countok)
+        {
+            try
+            {
+                if (!serialPort2.IsOpen)
+                {
+                    MessageBox.Show("Device is not connected.Scan will stop");
+                    return;
+                }
+                net = "4G + 5G";
+                len = 15;
+                string c1 = ("AT+QSCAN=2,1").
+                  Replace("\r", "").Replace("\n", "");
+                string c3 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                string c3n = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+
+                // outputFile = @"C:\amar\2goutput.txt";
+                //await Task.Run(() => 
+                if ((selectedcmbMode) == "Fast")
+                {
+                    //Handshake j = new Handshake();
+                    if (Countok < 1)
+                    {
+                        await SendSerialCommandAsync(@"AT+QNWPREFCFG= ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 2000, cancellationToken);
+                    }
+                    if (Countok >= 1 && Countok < 2)
+                    {
+                        await SendSerialCommandAsync(c3,2000,cancellationToken);
+                    }
+                    if (Countok >= 2 && Countok <= 4)
+                    {
+
+                        await SendSerialCommandAsync(c3n, 2000, cancellationToken);
+                    }
+                    if (Countok >= 4 && Countok < 7)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=1,1", 5000, cancellationToken);
+                    }
+
+                    if (Countok > 6 && Countok < 9)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=2,1",10000,cancellationToken);
+                    }
+
+                    if (Countok > 8 && Countok < 11)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=3,1",10000,cancellationToken);
+                    }
+
+                }
+                else
+                {
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected.Scan will stop");
+                        return;
+                    }
+                    if (Countok < 1)
+                    {
+                        await SendSerialCommandAsync(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71",2000,cancellationToken);
+                    }
+                    string c4 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                    string c4n = (@"AT+QNWPREFCFG =  ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                    if (Countok < 2)
+                    {
+                        await SendSerialCommandAsync(c4, 2000, cancellationToken);
+                    }
+                    if (Countok >= 2 && Countok < 4)
+                    {
+                        await SendSerialCommandAsync(c4n, 2000, cancellationToken);
+                    }
+                    if (Countok > 3 && Countok < 5)
+                    {
+
+                        await SendSerialCommandAsync("AT+QSCAN=1,1", 4000, cancellationToken);
+                    }
+                    if (Countok >= 5 && Countok < 7)
+                    {
+                        await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                    }
+                    if (Countok > 6 && Countok < 8)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                    }
+                    int[] bandS = { 1, 3, 5, 8, 40, 41 };
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected.Scan will stop");
+                        return;
+                    }
+                    if (Countok > 7 && Countok < 13)
+                    {
+                        if (Countok <= 8)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[0],2000,cancellationToken);
+                        }
+                        if (Countok > 8 && Countok < 11)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1",4000,cancellationToken);
+                        }
+                        if (Countok > 10 && Countok < 13)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 12 && Countok < 18)
+                    {
+                        if (Countok <= 13)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[1],2000,cancellationToken);
+                        }
+                        if (Countok > 13 && Countok < 16)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1",4000,cancellationToken);
+                        }
+                        if (Countok > 15 && Countok < 18)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 17 && Countok < 23)
+                    {
+                        if (Countok <= 18)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[2],2000,cancellationToken);
+                        }
+                        if (Countok > 18 && Countok < 21)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000, cancellationToken);
+
+                        }
+                        if (Countok > 20 && Countok < 23)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1",4000,cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 23 && Countok < 29)
+                    {
+                        if (Countok <= 24)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[3],2000,cancellationToken);
+                        }
+                        if (Countok > 24 && Countok < 27)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1",4000,cancellationToken);
+                        }
+                        if (Countok > 26 && Countok < 29)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 28 && Countok < 34)
+                    {
+                        if (Countok <= 29)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[4],2000,cancellationToken);
+                        }
+                        if (Countok > 29 && Countok < 33)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1",2000,cancellationToken);
+                        }
+                        if (Countok > 32 && Countok < 34)
+                        {
+                            //Countok++;
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",2000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 33 && Countok < 40)
+                    {
+                        if (Countok <= 35)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[5],2000,cancellationToken);
+                        }
+                        if (Countok > 35 && Countok < 38)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1",4000,cancellationToken);
+                        }
+                        if (Countok > 37 && Countok < 40)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+
+                    int[] bandSS = { 1, 3, 5, 8, 28, 40, 41, 58, 71, 77, 78, 79 };
+
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected.Scan will stop");
+                        return;
+                    }
+                    if (Countok > 39 && Countok < 45)
+                    {
+                        if (Countok <= 40)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[0],2000,cancellationToken);
+                        }
+                        if (Countok > 40 && Countok < 43)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 42 && Countok < 45)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 44 && Countok < 50)
+                    {
+                        if (Countok <= 45)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[1],2000,cancellationToken);
+                        }
+                        if (Countok > 45 && Countok < 48)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 47 && Countok < 50)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 49 && Countok < 55)
+                    {
+                        if (Countok <= 50)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[2],2000,cancellationToken);
+                        }
+                        if (Countok > 50 && Countok < 53)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 52 && Countok < 55)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 54 && Countok < 62)
+                    {
+                        if (Countok <= 55)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[3],2000,cancellationToken);
+                        }
+                        if (Countok > 55 && Countok < 58)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 57 && Countok < 60)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 59 && Countok < 65)
+                    {
+                        if (Countok <= 60)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[4],2000,cancellationToken);
+                        }
+                        if (Countok > 60 && Countok < 63)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 62 && Countok < 65)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 64 && Countok < 70)
+                    {
+                        if (Countok <= 65)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[5],2000,cancellationToken);
+                        }
+                        if (Countok > 65 && Countok < 68)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 67 && Countok < 70)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 69 && Countok < 75)
+                    {
+                        if (Countok <= 70)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[6],2000,cancellationToken);
+                        }
+                        if (Countok > 70 && Countok < 73)
+                        {
+                          await  SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 72 && Countok < 75)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 74 && Countok < 80)
+                    {
+                        if (Countok <= 75)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[7],2000,cancellationToken);
+                        }
+                        if (Countok > 75 && Countok < 78)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 77 && Countok < 80)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 79 && Countok < 85)
+                    {
+                        if (Countok <= 80)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[8],2000,cancellationToken);
+                        }
+                        if (Countok > 80 && Countok < 83)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 82 && Countok < 85)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 84 && Countok < 90)
+                    {
+                        if (Countok <= 85)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[9],2000,cancellationToken);
+                        }
+                        if (Countok > 85 && Countok < 88)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 87 && Countok < 90)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 89 && Countok < 95)
+                    {
+                        if (Countok <= 90)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[10],2000,cancellationToken);
+                        }
+                        if (Countok > 90 && Countok < 93)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok >= 92 && Countok < 95)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 94 && Countok < 100)
+                    {
+                        if (Countok <= 95)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSS[11],2000,cancellationToken);
+                        }
+                        if (Countok > 95 && Countok < 98)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 97 && Countok < 100)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    //add new band for 5g 
+                    if (Countok > 99 && Countok < 105)
+                    {
+                        if (Countok <= 100)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[0],2000,cancellationToken);
+                        }
+                        if (Countok > 100 && Countok < 103)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 102 && Countok < 105)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 104 && Countok < 110)
+                    {
+                        if (Countok <= 105)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[1],2000,cancellationToken);
+                        }
+                        if (Countok > 105 && Countok < 108)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 107 && Countok < 110)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 109 && Countok < 115)
+                    {
+                        if (Countok <= 110)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[2],2000,cancellationToken);
+                        }
+                        if (Countok > 110 && Countok < 113)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 112 && Countok < 115)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 114 && Countok < 112)
+                    {
+                        if (Countok <= 115)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[3],2000,cancellationToken);
+                        }
+                        if (Countok > 115 && Countok < 118)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 117 && Countok < 120)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 119 && Countok < 125)
+                    {
+                        if (Countok <= 120)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[4],2000,cancellationToken);
+                        }
+                        if (Countok > 120 && Countok < 123)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 122 && Countok < 125)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 124 && Countok < 130)
+                    {
+                        if (Countok <= 125)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[5],2000,cancellationToken);
+                        }
+                        if (Countok > 125 && Countok < 128)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 127 && Countok < 130)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 129 && Countok < 135)
+                    {
+                        if (Countok <= 130)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[6],2000,cancellationToken);
+                        }
+                        if (Countok > 130 && Countok < 133)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 132 && Countok < 135)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 134 && Countok < 140)
+                    {
+                        if (Countok <= 135)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[7],2000,cancellationToken);
+                        }
+                        if (Countok > 135 && Countok < 138)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 137 && Countok < 140)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 139 && Countok < 145)
+                    {
+                        if (Countok <= 140)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[8],2000,cancellationToken);
+                        }
+                        if (Countok > 140 && Countok < 143)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 142 && Countok < 145)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 144 && Countok < 150)
+                    {
+                        if (Countok <= 145)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[9],2000,cancellationToken);
+                        }
+                        if (Countok > 145 && Countok < 148)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 147 && Countok < 150)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 149 && Countok < 155)
+                    {
+                        if (Countok <= 150)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[10],2000,cancellationToken);
+                        }
+                        if (Countok > 150 && Countok < 153)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok >= 152 && Countok < 155)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+                    if (Countok > 154 && Countok < 160)
+                    {
+                        if (Countok <= 155)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSS[11],2000,cancellationToken);
+                        }
+                        if (Countok > 155 && Countok < 158)
+                        {
+                            await SendSerialCommandAsync(c1,4000,cancellationToken);
+                        }
+                        if (Countok > 157 && Countok < 160)
+                        {
+                            await  SendSerialCommandAsync("AT+QSCAN=3,1",4000,cancellationToken);
+                        }
+                    }
+
+                    //add new band for 5g
+                    if (Countok > 159 && Countok < 161)
+                    {
+                        await SendSerialCommandAsync(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71",2000,cancellationToken);
+                       
+                    }
+                    if (Countok > 160 && Countok < 162)
+                    {
+                        await SendSerialCommandAsync(c4,2000,cancellationToken);//);
+                       
+                    }
+                    if (Countok > 161 && Countok < 163)
+                    {
+                        await SendSerialCommandAsync(c4n,2000,cancellationToken);//);
+                        Thread.Sleep(2000);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+            }
+            #endregion
+
+            #region RunAsyncforAll
+            public async Task RunAsyncforAll(int Countok)
+        {
+            using (CancellationTokenSource cts = new CancellationTokenSource())
+            {
+                // Set a global timeout for the entire operation
+                cts.CancelAfter(TimeSpan.FromSeconds(30)); // e.g., 30 seconds
+
+                await ExecuteIoTCommandAsyncforAll(cts.Token, Countok);
+            }
+        }
+        public async Task ExecuteIoTCommandAsyncforAll(CancellationToken cancellationToken, int Countok)
+        {
+            try
+            {
+                net = "ALL";
+                //outputFile = @"C:\amar\2goutput.txt";
+
+                string c4 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                //add new cmd
+                string c4n = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+
+                string c1 = (@"AT+QNWPREFCFG=""mode_pref"",WCDMA").Replace("\r", "").Replace("\n", "");
+                // string c2 = ("At+cops=?").Replace("\r", "").Replace("\n", "");
+                string c3 = (@"AT+QENG=""servingcell""").Replace("\r", "").Replace("\n", "");
+                if ((selectedcmbMode) == "Fast")
+                {
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected.Scan will stop");
+                        return;
+                    }
+                    if (Countok < 1)
+                    {
+                        await SendSerialCommandAsync(c1, 2000, cancellationToken);
+                    }
+                    else if (Countok >= 1 && Countok < 3)
+                    {
+                        await SendSerialCommandAsync(c3, 3000, cancellationToken);
+                    }
+                    if (Countok > 2 && Countok < 4)
+                    {
+                        await SendSerialCommandAsync(@"AT+QNWPREFCFG= ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 2000, cancellationToken);
+                    }
+
+                    if (Countok > 3 && Countok < 6)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=1,1", 3000, cancellationToken);
+                    }
+                    if (Countok > 5 && Countok < 8)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=3,1", 3000, cancellationToken);
+                    }
+                    if (Countok > 7 && Countok < 9)
+                    {
+                        await SendSerialCommandAsync(c4, 2000, cancellationToken);
+                    }
+                    //Add new command
+                    if (Countok > 8 && Countok < 10)
+                    {
+                        await SendSerialCommandAsync(c4n, 2000, cancellationToken);
+                    }
+
+                    if (Countok > 9 && Countok < 12)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=2,1", 2000, cancellationToken);
+                    }
+                    if (Countok > 11 && Countok < 14)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
+                    }
+                }
+                else
+                {
+                    if (Countok < 1)
+                    {
+                        await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                    }
+                    else if (Countok >= 1 && Countok < 3)
+                    {
+                        await SendSerialCommandAsync(c3, 4000, cancellationToken);
+                    }
+                    if (Countok > 2 && Countok < 4)
+                    {
+                        await SendSerialCommandAsync(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 2000, cancellationToken);
+                    }
+                    if ((Countok >= 3) && Countok <= 5)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=1,1", 2000, cancellationToken);
+                    }
+                    if (Countok > 5 && Countok < 8)
+                    {
+                        await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
+                    }
+                    int[] bandS = { 1, 3, 5, 8, 40, 41 };
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected.Scan will stop");
+                        return;
+                    }
+                    if ((Countok > 7 && Countok < 13))
+                    {
+
+                        if (Countok > 7 && Countok < 9)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[0], 2000, cancellationToken);
+                        }
+                        if (Countok > 8 && Countok < 11)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1", 2000, cancellationToken);
+                        }
+                        if (Countok > 10 && Countok < 13)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
+                        }
+                    }
+                    if ((Countok > 12 && Countok < 18))
+                    {
+                        if (Countok > 12 && Countok < 14)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[1], 2000, cancellationToken);
+                        }
+                        if (Countok > 13 && Countok < 16)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1", 2000, cancellationToken);
+                        }
+                        if (Countok > 15 && Countok < 18)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
+                        }
+                    }
+                    if ((Countok > 17 && Countok < 23))
+                    {
+                        if (Countok > 17 && Countok < 19)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[2], 2000, cancellationToken);
+                        }
+                        if (Countok > 18 && Countok < 21)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1", 2000, cancellationToken);
+                        }
+                        if (Countok > 20 && Countok < 23)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
+                        }
+                    }
+                    if ((Countok > 22 && Countok < 28))
+                    {
+                        if (Countok > 22 && Countok < 24)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[3], 2000, cancellationToken);
+                        }
+                        if (Countok > 23 && Countok < 26)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1", 2000, cancellationToken);
+                        }
+                        if (Countok > 25 && Countok < 28)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
+                        }
+                    }
+                    if ((Countok > 27 && Countok < 33))
+                    {
+                        if (Countok > 27 && Countok < 29)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[4], 2000, cancellationToken);
+                        }
+                        if (Countok > 28 && Countok < 31)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1", 2000, cancellationToken);
+                        }
+                        if (Countok > 30 && Countok < 33)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
+                        }
+                    }
+                    if ((Countok > 32 && Countok < 38))
+                    {
+                        if (Countok > 32 && Countok < 34)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[5], 2000, cancellationToken);
+                        }
+                        if (Countok > 33 && Countok < 36)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1", 2000, cancellationToken);
+                        }
+                        if (Countok > 35 && Countok < 38)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 37 && Countok < 39)
+                    {
+                        await SendSerialCommandAsync(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 2000, cancellationToken);
+                    }
+                    string c33 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                    //add new cmd
+                    string c33n = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+
+                    string c11 = ("AT+QSCAN=2,1").Replace("\r", "").Replace("\n", "");
+                    string c2 = ("AT+QSCAN=3,1").Replace("\r", "").Replace("\n", "");
+
+                    if (Countok > 38 && Countok < 40)
+                    {
+                        await SendSerialCommandAsync(c33, 2000, cancellationToken);
+                    }
+                    //add new command
+                    if (Countok > 39 && Countok < 41)
+                    {
+                        await SendSerialCommandAsync(c33n, 2000, cancellationToken);
+                    }
+                    if (Countok > 40 && Countok < 43)
+                    {
+                        await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                    }
+                    if (Countok > 42 && Countok < 45)
+                    {
+                        await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                    }
+                    int[] bandSs = { 1, 3, 5, 8, 28, 40, 41, 58, 71, 77, 78, 79 };
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected.Scan will stop");
+                        return;
+                    }
+
+                    if (Countok > 44 && Countok < 50)
+                    {
+                        if (Countok > 44 && Countok < 46)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[0], 2000, cancellationToken);
+                        }
+                        if (Countok > 45 && Countok < 48)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 47 && Countok < 50)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 49 && Countok < 55)
+                    {
+                        if (Countok > 49 && Countok < 51)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[1], 2000, cancellationToken);
+                        }
+                        if (Countok > 50 && Countok < 53)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 52 && Countok < 55)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 54 && Countok < 60)
+                    {
+                        if (Countok > 54 && Countok < 56)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[2], 2000, cancellationToken);
+                        }
+                        if (Countok > 55 && Countok < 58)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 57 && Countok < 60)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 59 && Countok < 65)
+                    {
+                        if (Countok > 59 && Countok < 61)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[3], 2000, cancellationToken);
+                        }
+                        if (Countok > 60 && Countok < 63)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 62 && Countok < 65)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 64 && Countok < 70)
+                    {
+                        if (Countok > 64 && Countok < 66)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[4], 2000, cancellationToken);
+                        }
+                        if (Countok > 65 && Countok < 68)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 67 && Countok < 70)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 69 && Countok < 75)
+                    {
+                        if (Countok > 69 && Countok < 71)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[5], 2000, cancellationToken);
+                        }
+                        if (Countok > 70 && Countok < 73)
+                        {
+                            await SendSerialCommandAsync(c11, 4000, cancellationToken);
+                        }
+                        if (Countok > 72 && Countok < 75)
+                        {
+                            await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 74 && Countok < 80)
+                    {
+                        if (Countok > 74 && Countok < 76)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[6], 2000, cancellationToken);
+                        }
+                        if (Countok > 75 && Countok < 78)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 77 && Countok < 80)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 79 && Countok < 85)
+                    {
+                        if (Countok > 79 && Countok < 81)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[7], 2000, cancellationToken);
+                        }
+                        if (Countok > 80 && Countok < 83)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 82 && Countok < 85)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 84 && Countok < 90)
+                    {
+                        if (Countok > 84 && Countok < 86)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[8], 2000, cancellationToken);
+                        }
+                        if (Countok > 85 && Countok < 88)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 87 && Countok < 90)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 90 && Countok < 96)
+                    {
+                        if (Countok > 90 && Countok < 92)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[9], 2000, cancellationToken);
+                        }
+                        if (Countok > 91 && Countok < 94)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 93 && Countok < 96)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 95 && Countok < 101)
+                    {
+                        if (Countok > 95 && Countok < 97)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[10], 2000, cancellationToken);
+                        }
+                        if (Countok > 96 && Countok < 99)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 98 && Countok < 101)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 100 && Countok < 106)
+                    {
+                        if (Countok > 100 && Countok < 102)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[11], 2000, cancellationToken);
+                        }
+                        if (Countok > 101 && Countok < 104)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 103 && Countok < 106)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    //for new band add one by one
+
+                    if (Countok > 105 && Countok < 111)
+                    {
+                        if (Countok > 105 && Countok < 107)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[0], 2000, cancellationToken);
+                        }
+                        if (Countok > 106 && Countok < 109)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 108 && Countok < 111)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 110 && Countok < 116)
+                    {
+                        if (Countok > 110 && Countok < 112)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[1], 2000, cancellationToken);
+                        }
+                        if (Countok > 111 && Countok < 114)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 113 && Countok < 116)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 115 && Countok < 121)
+                    {
+                        if (Countok > 115 && Countok < 117)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[2], 2000, cancellationToken);
+                        }
+                        if (Countok > 116 && Countok < 119)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 118 && Countok < 121)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 120 && Countok < 126)
+                    {
+                        if (Countok > 120 && Countok < 122)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[3], 2000, cancellationToken);
+                        }
+                        if (Countok > 121 && Countok < 124)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 123 && Countok < 126)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 125 && Countok < 131)
+                    {
+                        if (Countok > 125 && Countok < 127)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[4], 2000, cancellationToken);
+                        }
+                        if (Countok > 126 && Countok < 129)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 128 && Countok < 131)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 130 && Countok < 136)
+                    {
+                        if (Countok > 130 && Countok < 132)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[5], 2000, cancellationToken);
+                        }
+                        if (Countok > 131 && Countok < 134)
+                        {
+                            await SendSerialCommandAsync(c11, 4000, cancellationToken);
+                        }
+                        if (Countok > 133 && Countok < 136)
+                        {
+                            await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 135 && Countok < 141)
+                    {
+                        if (Countok > 135 && Countok < 137)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[6], 2000, cancellationToken);
+                        }
+                        if (Countok > 136 && Countok < 139)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 138 && Countok < 141)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 140 && Countok < 146)
+                    {
+                        if (Countok > 140 && Countok < 142)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[7], 2000, cancellationToken);
+                        }
+                        if (Countok > 141 && Countok < 144)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 143 && Countok < 146)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 145 && Countok < 151)
+                    {
+                        if (Countok > 145 && Countok < 147)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[8], 2000, cancellationToken);
+                        }
+                        if (Countok > 146 && Countok < 149)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 148 && Countok < 151)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 150 && Countok < 156)
+                    {
+                        if (Countok > 150 && Countok < 152)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[9], 2000, cancellationToken);
+                        }
+                        if (Countok > 151 && Countok < 154)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 153 && Countok < 156)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    if (Countok > 155 && Countok < 161)
+                    {
+                        if (Countok > 155 && Countok < 157)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[10], 2000, cancellationToken);
+                        }
+                        if (Countok > 156 && Countok < 159)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 158 && Countok < 161)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+
+                    }
+                    if (Countok > 160 && Countok < 166)
+                    {
+                        if (Countok > 160 && Countok < 162)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[11], 2000, cancellationToken);
+                        }
+                        if (Countok > 161 && Countok < 164)
+                        {
+                            await SendSerialCommandAsync(c11, 2000, cancellationToken);
+                        }
+                        if (Countok > 163 && Countok < 166)
+                        {
+                            await SendSerialCommandAsync(c2, 2000, cancellationToken);
+                        }
+                    }
+                    //for new band add one by one
+
+                    if (Countok > 165 && Countok < 167)
+                    {
+                        await SendSerialCommandAsync(c33, 2000, cancellationToken);
+                    }
+                    if (Countok > 166 && Countok < 168)
+                    {
+                        await SendSerialCommandAsync(c33n, 3000, cancellationToken);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}");
+            }
+           
+        }
+        #endregion
+        #region 3GNetwork 
+        public async Task RunAsync3g(int Countok)
+        {
+            using (CancellationTokenSource cts = new CancellationTokenSource())
+            {
+                // Set a global timeout for the entire operation
+                cts.CancelAfter(TimeSpan.FromSeconds(30)); // e.g., 30 seconds
+
+                await ExecuteIoTCommandAsync3G(cts.Token, Countok);
+            }
+        }
+        public async Task ExecuteIoTCommandAsync3G(CancellationToken cancellationToken, int Countok)
+        {
+                try
+                {
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected.Scan will stop");
+                        return;
+                    }
+                    net = "3G";
+                    string s = "\"blabla\"";
+                    len = 11;
+                    //outputFile = @"C:\amar\2goutput.txt";
+                    string c1 = (@"AT+QNWPREFCFG=""mode_pref"",WCDMA").Replace("\r", "").Replace("\n", "");
+                    // string c2 = ("At+cops=?").Replace("\r", "").Replace("\n", "");
+                    string c3 = (@"AT+QENG=""servingcell""").Replace("\r", "").Replace("\n", "");
+                    if ((selectedcmbMode) == "Fast")
+                    {
+                        if (Countok < 1)
+                        {
+                            await SendSerialCommandAsync(c1, 10000, cancellationToken);
+                        }
+                        else if (Countok >= 1 && Countok <= 3)
+                        {
+                            await SendSerialCommandAsync(c3, 10000, cancellationToken);
+                        }
+                    }
+                    else
+                    {
+                        if (Countok < 1)
+                        {
+                            await SendSerialCommandAsync(c1,10000,cancellationToken);
+                        }
+                        else if (Countok >= 1 && Countok < 6)
+                        {
+                            await SendSerialCommandAsync(c3,10000,cancellationToken);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occurred: {ex.Message}");
+                }
+                
+            }
+            #endregion
+
+            #region 4GNetwork
+            public async Task RunAsync4g(int Countok)
+            {
+                using (CancellationTokenSource cts = new CancellationTokenSource())
+                {
+                    // Set a global timeout for the entire operation
+                    cts.CancelAfter(TimeSpan.FromSeconds(30)); // e.g., 30 seconds
+
+                    await ExecuteIoTCommandAsync4G(cts.Token, Countok);
+                }
+            }
+
+            public async Task ExecuteIoTCommandAsync4G(CancellationToken cancellationToken, int Countok)
+            {
+                try
+                {
+                    if (!serialPort2.IsOpen)
+                    {
+                        MessageBox.Show("Device is not connected. Scan will stop.");
+                        return;
+                    }
+
+                    if ((selectedcmbMode) == "Fast")
+                    {
+                        if (Countok < 1 && Countok < 2)
+                        {
+                            await SendSerialCommandAsync(
+                          @"AT+QNWPREFCFG= ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 5000, cancellationToken);
+
+                        }
+                        if (Countok >= 1 && Countok < 3)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1", 10000, cancellationToken);
+
+                        }
+                        if (Countok > 2 && Countok < 5)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1", 10000, cancellationToken);
+
+                        }
+                        //await Task.Run(() => 
+                    }
+                    else
+                    {
+                        if (Countok < 1 && Countok < 2)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 4000, cancellationToken);
+                        }
+                        if ((Countok >= 1 || Countok < 1) && Countok <= 3)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=1,1", 4000, cancellationToken);
+                        }
+                        if (Countok > 3 && Countok < 6)
+                        {
+                            await SendSerialCommandAsync("AT+QSCAN=3,1", 4000, cancellationToken);
+                        }
+                        int[] bandS = { 1, 3, 5, 8, 40, 41 };
+                        if (!serialPort2.IsOpen)
+                        {
+                            MessageBox.Show("Device is not connected.Scan will stop");
+                            return;
+                        }
+                        if ((Countok >= 6 && Countok < 11))
+                        {
+
+                            if (Countok >= 6 && Countok < 7)
+                            {
+                                await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[0], 3000, cancellationToken);
+                            }
+                            if (Countok > 6 && Countok < 9)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=1,1", 5000, cancellationToken);
+                            }
+                            if (Countok >= 9 && Countok < 11)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=3,1", 4000, cancellationToken);
+                            }
+                        }
+                        if ((Countok >= 11 && Countok < 16))
+                        {
+                            if (Countok >= 11 && Countok < 12)
+                            {
+                                await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[1], 3000, cancellationToken);
+                            }
+                            if (Countok > 11 && Countok < 14)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=1,1", 4000, cancellationToken);
+                            }
+                            if (Countok >= 14 && Countok < 16)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=3,1", 4000, cancellationToken);
+                            }
+                        }
+                        if ((Countok >= 16 && Countok < 21))
+                        {
+                            if (Countok >= 16 && Countok < 17)
+                            {
+                                await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[2], 3000, cancellationToken);
+                            }
+                            if (Countok > 16 && Countok < 19)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=1,1", 4000, cancellationToken);
+                            }
+                            if (Countok >= 19 && Countok < 21)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=3,1", 4000, cancellationToken);
+                            }
+                        }
+                        if ((Countok >= 21 && Countok < 26))
+                        {
+                            if (Countok >= 21 && Countok < 22)
+                            {
+                                await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[3], 3000, cancellationToken);
+                            }
+                            if (Countok > 21 && Countok < 24)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=1,1", 4000, cancellationToken);
+                            }
+                            if (Countok >= 24 && Countok < 26)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=3,1", 4000, cancellationToken);
+                            }
+                        }
+                        if ((Countok >= 26 && Countok < 31))
+                        {
+                            if (Countok >= 26 && Countok < 27)
+                            {
+                                await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[4], 2000, cancellationToken);
+                            }
+                            if (Countok > 26 && Countok < 29)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=1,1", 4000, cancellationToken);
+                            }
+                            if (Countok >= 29 && Countok < 31)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=3,1", 4000, cancellationToken);
+                            }
+                        }
+                        if ((Countok >= 31 && Countok < 36))
+                        {
+                            if (Countok >= 31 && Countok < 32)
+                            {
+                                await SendSerialCommandAsync(@"AT+QNWPREFCFG=""lte_band""," + bandS[5], 3000, cancellationToken);
+                            }
+                            if (Countok > 31 && Countok < 34)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=1,1", 4000, cancellationToken);
+                            }
+                            if (Countok >= 34 && Countok < 36)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=3,1", 4000, cancellationToken);
+                            }
+                        }
+
+                        if (Countok <= 38)
+                        {
+                            await SendSerialCommandAsync(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 3000, cancellationToken);
+
+                        }
+                    }
+
+
+                }
+                catch (OperationCanceledException)
+                {
+                    MessageBox.Show("Operation was canceled due to a timeout or user request.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occurred: {ex.Message}");
+                }
+            }
+
+            #endregion
+
+            #region 5GNetwork
+            public async Task RunAsync5g(int Countok)
+            {
+                using (CancellationTokenSource cts = new CancellationTokenSource())
+                {
+                    // Set a global timeout for the entire operation
+                    cts.CancelAfter(TimeSpan.FromSeconds(30)); // e.g., 30 seconds
+                    await ExecuteIoTCommandAsync5G(cts.Token, Countok);
+                }
+            }
+
+            public async Task ExecuteIoTCommandAsync5G(CancellationToken cancellationToken, int Countok)
+            {
+                try
                 {
                     try
                     {
-                        serialPort2.Write(queue.Dequeue() + Environment.NewLine);
-                        lockk = true;
+                        if (!serialPort2.IsOpen)
+                        {
+                            MessageBox.Show("Device is not connected.Scan will stop");
+                            return;
+                        }
+                        //string f = @"Joe said ""Hello"" to me";
+                        net = "5G";
+                        len = 11;
+                        //outputFile = @"C:\amar\2goutput.txt";
+                        string c3 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+                        string c4 = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+
+                        string c1 = ("AT+QSCAN=2,1").
+                            Replace("\r", "").Replace("\n", "");
+                        string c2 = ("AT+QSCAN=3,1").Replace("\r", "").Replace("\n", "");
+                        if ((selectedcmbMode) == "Fast")
+                        {
+                            if (Countok < 1)
+                            {
+                                await SendSerialCommandAsync(c3, 4000, cancellationToken);//);
+                            }
+
+                            if (Countok >= 1 && Countok < 3)
+                            {
+                                await SendSerialCommandAsync(c4, 4000, cancellationToken);
+                            }
+
+                            if (Countok >= 3 && Countok < 5)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=2,1", 10000, cancellationToken);
+                            }
+                            if (Countok > 4 && Countok < 8)
+                            {
+                                await SendSerialCommandAsync("AT+QSCAN=3,1", 5000, cancellationToken);
+                            }
+                        }
+                        else
+                        {
+                            if (Countok < 1)
+                            {
+                                await SendSerialCommandAsync(c3, 4000, cancellationToken);//);
+
+                            }
+                            if (Countok >= 1 && Countok < 2)
+                            {
+                                await SendSerialCommandAsync(c4, 3000, cancellationToken);
+                            }
+
+                            if (Countok >= 2 && Countok < 4)
+                            {
+                                await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                            }
+                            if (Countok > 3 && Countok <= 6)
+                            {
+                                await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                            }
+                            int[] bandS = { 1, 3, 5, 8, 28, 40, 41, 58, 71, 77, 78, 79 };
+                            if (!serialPort2.IsOpen)
+                            {
+                                MessageBox.Show("Device is not connected.Scan will stop");
+                                return;
+                            }
+                            if (Countok > 6 && Countok < 12)
+                            {
+                                if (Countok <= 7)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[0], 3000, cancellationToken);
+                                }
+                                if (Countok > 7 && Countok <= 9)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 9 && Countok < 12)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            if (Countok > 11 && Countok < 17)
+                            {
+                                if (Countok <= 12)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[1], 2000, cancellationToken);
+                                }
+                                if (Countok > 12 && Countok <= 14)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 14 && Countok < 17)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 16 && Countok < 22)
+                            {
+                                if (Countok <= 17)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[2], 2000, cancellationToken);
+                                }
+                                if (Countok > 17 && Countok <= 19)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 19 && Countok < 22)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 21 && Countok < 27)
+                            {
+                                if (Countok <= 22)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[3], 2000, cancellationToken);
+                                }
+                                if (Countok > 22 && Countok <= 24)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 24 && Countok < 27)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 26 && Countok < 32)
+                            {
+                                if (Countok <= 27)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[4], 2000, cancellationToken);
+                                }
+                                if (Countok > 27 && Countok <= 29)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 29 && Countok < 32)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            if (Countok > 31 && Countok < 37)
+                            {
+                                if (Countok <= 32)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[5], 2000, cancellationToken);
+                                }
+                                if (Countok > 32 && Countok <= 35)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 35 && Countok < 38)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 37 && Countok < 43)
+                            {
+                                if (Countok <= 38)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[6], 2000, cancellationToken);
+                                }
+                                if (Countok > 38 && Countok <= 40)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 40 && Countok < 43)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            if (Countok > 42 && Countok < 48)
+                            {
+                                if (Countok <= 43)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[7], 2000, cancellationToken);
+                                }
+                                if (Countok > 43 && Countok <= 45)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 45 && Countok < 48)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 47 && Countok < 53)
+                            {
+                                if (Countok <= 48)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[8], 2000, cancellationToken);
+                                }
+                                if (Countok > 48 && Countok <= 50)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 50 && Countok < 53)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            if (Countok > 52 && Countok < 58)
+                            {
+                                if (Countok <= 53)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[9], 2000, cancellationToken);
+                                }
+                                if (Countok > 53 && Countok <= 55)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 55 && Countok < 58)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 57 && Countok < 63)
+                            {
+                                if (Countok <= 58)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[10], 2000, cancellationToken);
+                                }
+                                if (Countok > 58 && Countok <= 60)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 60 && Countok < 63)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 62 && Countok < 68)
+                            {
+                                if (Countok <= 63)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandS[11], 2000, cancellationToken);
+                                }
+                                if (Countok > 63 && Countok <= 65)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 65 && Countok < 68)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            //for add new command
+                            if (Countok > 67 && Countok < 73)
+                            {
+                                if (Countok <= 67)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[0], 2000, cancellationToken);
+                                }
+                                if (Countok > 68 && Countok <= 70)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 69 && Countok < 72)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 71 && Countok < 78)
+                            {
+                                if (Countok <= 72)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[1], 2000, cancellationToken);
+                                }
+                                if (Countok > 72 && Countok <= 74)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 74 && Countok < 77)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 76 && Countok < 82)
+                            {
+                                if (Countok <= 77)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[2], 2000, cancellationToken);
+                                }
+                                if (Countok > 77 && Countok <= 79)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 79 && Countok < 82)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 81 && Countok < 87)
+                            {
+                                if (Countok <= 82)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[3], 2000, cancellationToken);
+                                }
+                                if (Countok > 82 && Countok <= 84)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 84 && Countok < 87)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 86 && Countok < 92)
+                            {
+                                if (Countok <= 87)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[4], 2000, cancellationToken);
+                                }
+                                if (Countok > 87 && Countok <= 89)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 89 && Countok < 92)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 91 && Countok < 97)
+                            {
+                                if (Countok <= 92)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[5], 2000, cancellationToken);
+                                }
+                                if (Countok > 92 && Countok <= 95)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 95 && Countok < 98)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 97 && Countok < 103)
+                            {
+                                if (Countok <= 98)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[6], 2000, cancellationToken);
+                                }
+                                if (Countok > 98 && Countok <= 100)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 100 && Countok < 103)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            if (Countok > 102 && Countok < 108)
+                            {
+                                if (Countok <= 103)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[7], 2000, cancellationToken);
+                                }
+                                if (Countok > 103 && Countok <= 105)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 105 && Countok < 108)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            if (Countok > 107 && Countok < 113)
+                            {
+                                if (Countok <= 108)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[8], 2000, cancellationToken);
+                                }
+                                if (Countok > 108 && Countok <= 110)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 110 && Countok < 113)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            if (Countok > 112 && Countok < 118)
+                            {
+                                if (Countok <= 113)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[9], 2000, cancellationToken);
+                                }
+                                if (Countok > 113 && Countok <= 115)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 115 && Countok < 118)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+                            }
+                            if (Countok > 117 && Countok < 123)
+                            {
+                                if (Countok <= 118)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[10], 2000, cancellationToken);
+                                }
+                                if (Countok > 118 && Countok <= 120)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 120 && Countok < 123)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            if (Countok > 122 && Countok < 128)
+                            {
+
+
+                                if (Countok <= 123)
+                                {
+                                    await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandS[11], 2000, cancellationToken);
+                                }
+                                if (Countok > 123 && Countok <= 125)
+                                {
+                                    await SendSerialCommandAsync(c1, 4000, cancellationToken);
+                                }
+                                if (Countok > 125 && Countok < 128)
+                                {
+                                    await SendSerialCommandAsync(c2, 4000, cancellationToken);
+                                }
+
+                            }
+                            //for add new command
+                            if (Countok >= 127 && Countok < 129)
+                            {
+                                await SendSerialCommandAsync(c3, 4000, cancellationToken);
+                            }
+
+                            if (Countok >= 128 && Countok < 130)
+                            {
+                                await SendSerialCommandAsync(c4, 3000, cancellationToken);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
 
                     }
+
                 }
-                //try
+                catch (OperationCanceledException)
+                {
+                    MessageBox.Show("Operation was canceled due to a timeout or user request.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occurred: {ex.Message}");
+                }
+            }
+            #endregion
+
+            void serialWrite(string cmd)
+            {
+                if (cmd != null)
+                    queue.Enqueue(cmd);
+                lock (this)
+                {
+                    if (lockk == false && queue.Count > 0)
+                    {
+                        try
+                        {
+                            serialPort2.Write(queue.Dequeue() + Environment.NewLine);
+                            lockk = true;
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                    //try
+                    //{
+                    //    final = final + " " + queue.Dequeue().ToString();
+                    //    if (final.Contains("ok") || final.Contains("ok"))
+                    //    {
+                    //        MessageBox.Show("ok");
+
+                    //    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+
+                    //}
+                }
+
+            }
+            #endregion
+            private void Dashboard5G_FormClosing(object sender, FormClosingEventArgs e)
+            {
+                try
+                {
+                    if (serialPort2.IsOpen)
+                        serialPort2.Close();
+                }
+                catch (Exception ee)
+                {
+                    throw;
+                }
+            }
+            public Dictionary<String, string> dataCleaner(String data)
+            {
+                int xm = 0;
+                string info = "false";
+                typ = "csn";
+                Dictionary<String, String> map = new Dictionary<string, string>();
+                if (data.Contains("QSCAN:") || data.Contains("LTE") || data.Contains("NR5G") || data.Contains("QENG"))
+                {
+                    info = "true";
+                    typ = "ccin";
+                }
+                //if (data.Contains("+CMGRMI:"))
                 //{
-                //    final = final + " " + queue.Dequeue().ToString();
-                //    if (final.Contains("ok") || final.Contains("ok"))
-                //    {
-                //        MessageBox.Show("ok");
-
-                //    }
+                //    typ = "cmg";
+                //    len = 15;
                 //}
-                //catch (Exception ex)
-                //{
-
-                //}
-            }
-
-        }
-        private void Dashboard5G_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            try
-            {
-                if (serialPort2.IsOpen)
-                    serialPort2.Close();
-            }
-            catch (Exception ee)
-            {
-                throw;
-            }
-        }
-        public Dictionary<String, string> dataCleaner(String data)
-        {
-            int xm = 0;
-            string info = "false";
-            typ = "csn";
-            Dictionary<String, String> map = new Dictionary<string, string>();
-            if (data.Contains("QSCAN:") || data.Contains("LTE") || data.Contains("NR5G") || data.Contains("QENG"))
-            {
-                info = "true";
-                typ = "ccin";
-            }
-            //if (data.Contains("+CMGRMI:"))
-            //{
-            //    typ = "cmg";
-            //    len = 15;
-            //}
-            String[] datas = data.Split(new char[] { ',' });
-            //if (datas.Length < len)
-            //    return null;
-            foreach (var val in datas)
-            {
-                if (string.IsNullOrEmpty(val) || val.Contains("QSCAN") || val.Contains("LTE") || val.Contains("WCDMA") || val.Contains(@"QNWPREFCFG=""mode_pref""")
-                    || val.Contains(@"AT+QENG=""servingcell""") || val.Contains(@"+QENG: ""servingcell"""))
-                    continue;
-
-                if (a == "4G" && net == "4G" && data.Contains("LTE"))
+                String[] datas = data.Split(new char[] { ',' });
+                //if (datas.Length < len)
+                //    return null;
+                foreach (var val in datas)
                 {
-                    String[] vals = val.Split(':');
+                    if (string.IsNullOrEmpty(val) || val.Contains("QSCAN") || val.Contains("LTE") || val.Contains("WCDMA") || val.Contains(@"QNWPREFCFG=""mode_pref""")
+                        || val.Contains(@"AT+QENG=""servingcell""") || val.Contains(@"+QENG: ""servingcell"""))
+                        continue;
 
-                    if (!map.ContainsKey(vals[0]))
-                    {
-                        try
-                        {
-                            if (!map.ContainsKey("mcc"))
-                            {
-                                if (datas[1] == vals[0])
-                                    map.Add("mcc", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("mnc"))
-                            {
-                                if (datas[2] == vals[0])
-                                    map.Add("mnc", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("lac"))
-                            {
-                                if (datas[10] == vals[0])
-                                    map.Add("lac", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("arfcn"))
-                            {
-                                if (datas[3] == vals[0])
-                                    map.Add("arfcn", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("bsic"))
-                            {
-                                if (datas[4] == vals[0])
-                                    map.Add("bsic", vals[0].Trim());
-                            }
-
-                            if (!map.ContainsKey("dBm"))
-                            {
-                                if (datas[5] == vals[0])
-                                    map.Add("dBm", vals[0].Trim());
-                            }
-
-                            if (!map.ContainsKey("cellid"))
-                            {
-                                if (datas[9] == vals[0])
-                                    map.Add("cellid", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("tac"))
-                            {
-                                if (datas[10] == vals[0])
-                                    map.Add("tac", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("net"))
-                            {
-                                if (datas[0].Contains("NR5G"))
-                                    map.Add("net", "5G");
-                                if (datas[0].Contains("LTE"))
-                                    map.Add("net", "4G");
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
-                }
-
-                else if (a == "5G" && net == "5G" && data.Contains("NR5G"))
-                {
-                    String[] vals = val.Split(':');
-
-                    if (!map.ContainsKey(vals[0]))
-                    {
-                        try
-                        {
-                            if (!map.ContainsKey("mcc"))
-                            {
-                                if (datas[1] == vals[0])
-                                    map.Add("mcc", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("mnc"))
-                            {
-                                if (datas[2] == vals[0])
-                                    map.Add("mnc", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("lac"))
-                            {
-                                if (datas[10] == vals[0])
-                                    map.Add("lac", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("cellid"))
-                            {
-                                if (datas[9] == vals[0])
-                                    map.Add("cellid", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("arfcn"))
-                            {
-                                if (datas[3] == vals[0])
-                                    map.Add("arfcn", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("bsic"))
-                            {
-                                if (datas[4] == vals[0])
-                                    map.Add("bsic", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("dBm"))
-                            {
-                                if (datas[5] == vals[0])
-                                    map.Add("dBm", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("tac"))
-                            {
-                                if (datas[10] == vals[0])
-                                    map.Add("tac", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("net"))
-                            {
-                                if (datas[0].Contains("NR5G"))
-                                    map.Add("net", "5G");
-                                if (datas[0].Contains("LTE"))
-                                    map.Add("net", "4G");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
-                }
-
-                else if (a == "4G + 5G")
-                {
-                    String[] vals = val.Split(':');
-
-                    if (!map.ContainsKey(vals[0]))
-                    {
-                        try
-                        {
-                            if (!map.ContainsKey("mcc"))
-                            {
-                                if (datas[1] == vals[0])
-                                    map.Add("mcc", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("mnc"))
-                            {
-                                if (datas[2] == vals[0])
-                                    map.Add("mnc", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("lac"))
-                            {
-                                if (datas[10] == vals[0])
-                                    map.Add("lac", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("cellid"))
-                            {
-                                if (datas[9] == vals[0])
-                                    map.Add("cellid", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("arfcn"))
-                            {
-                                if (datas[3] == vals[0])
-                                    map.Add("arfcn", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("bsic"))
-                            {
-                                if (datas[4] == vals[0])
-                                    map.Add("bsic", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("dBm"))
-                            {
-                                if (datas[5] == vals[0])
-                                    map.Add("dBm", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("tac"))
-                            {
-                                if (datas[10] == vals[0])
-                                    map.Add("tac", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("net"))
-                            {
-                                if (datas[0].Contains("NR5G"))
-                                    map.Add("net", "5G");
-                                if (datas[0].Contains("LTE"))
-                                    map.Add("net", "4G");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
-                }
-
-                else if (a == "3G")
-                {
-                    // +QENG: "servingcell","LIMSRV","WCDMA",404,59,1C21,13DA00C,10732,114,42,-67,-8,-,-,-,-,- AT+QENG=\"servingcell\
-                    //In WCDMA mode:
-                    //+QENG:"servingcell",<state>,"WCDMA",<MCC>,<MNC>,<LAC>,<cellID>,<uarfcn>,<PSC>,<RAC>,<RSCP>,<ecio>,<phych>,<SF>,<slot>,<speech_code>,<comMod>
-                    //                        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
-                    String[] vals = val.Split(':');
-
-                    if (!map.ContainsKey(vals[0]))
-                    {
-                        try
-                        {
-                            if (!map.ContainsKey("mcc"))
-                            {
-                                if (datas[3] == vals[0])
-                                    map.Add("mcc", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("mnc"))
-                            {
-                                if (datas[4] == vals[0])
-                                    map.Add("mnc", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("lac"))
-                            {
-                                if (datas[5] == vals[0])
-                                    map.Add("lac", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("cellid"))
-                            {
-                                if (datas[6] == vals[0])
-                                    map.Add("cellid", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("arfcn"))
-                            {
-                                if (datas[7] == vals[0])
-                                    map.Add("arfcn", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("bsic"))
-                            {
-                                if (datas[8] == vals[0])
-                                    map.Add("bsic", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("tac"))
-                            {
-                                if (datas[5] == vals[0])
-                                    map.Add("tac", vals[0].Trim());
-                            }
-                            if (!map.ContainsKey("dBm"))
-                            {
-                                if (datas[10] == vals[0])
-                                    map.Add("dBm", hexToInteger(vals[0].Trim()));
-                            }
-                            if (!map.ContainsKey("net"))
-                            {
-                                map.Add("net", "3G");
-                            }
-                            // row["(A/E/U)RFCN"] = map["arfcn"];
-                            // row["ENB"] = map["dBm"];btn
-                            // row["ECI"] = map["cellid"];
-                            // row["Network Type"] = map["net"];
-                            // row["BSIC/PSC/PCI"] = map["bsic"];
-                            //row["DBM"] = map["dBm"];
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
-                }
-
-                else if (a == "ALL")
-                {
-                    if (data.Contains("LTE"))
+                    if (a == "4G" && net == "4G" && data.Contains("LTE"))
                     {
                         String[] vals = val.Split(':');
 
@@ -3726,7 +5555,7 @@ namespace CligenceCellIDGrabber
                         }
                     }
 
-                    else if (data.Contains("NR5G"))
+                    else if (a == "5G" && net == "5G" && data.Contains("NR5G"))
                     {
                         String[] vals = val.Split(':');
 
@@ -3788,7 +5617,71 @@ namespace CligenceCellIDGrabber
                             }
                         }
                     }
-                    else
+
+                    else if (a == "4G + 5G")
+                    {
+                        String[] vals = val.Split(':');
+
+                        if (!map.ContainsKey(vals[0]))
+                        {
+                            try
+                            {
+                                if (!map.ContainsKey("mcc"))
+                                {
+                                    if (datas[1] == vals[0])
+                                        map.Add("mcc", vals[0].Trim());
+                                }
+                                if (!map.ContainsKey("mnc"))
+                                {
+                                    if (datas[2] == vals[0])
+                                        map.Add("mnc", vals[0].Trim());
+                                }
+                                if (!map.ContainsKey("lac"))
+                                {
+                                    if (datas[10] == vals[0])
+                                        map.Add("lac", hexToInteger(vals[0].Trim()));
+                                }
+                                if (!map.ContainsKey("cellid"))
+                                {
+                                    if (datas[9] == vals[0])
+                                        map.Add("cellid", hexToInteger(vals[0].Trim()));
+                                }
+                                if (!map.ContainsKey("arfcn"))
+                                {
+                                    if (datas[3] == vals[0])
+                                        map.Add("arfcn", vals[0].Trim());
+                                }
+                                if (!map.ContainsKey("bsic"))
+                                {
+                                    if (datas[4] == vals[0])
+                                        map.Add("bsic", vals[0].Trim());
+                                }
+                                if (!map.ContainsKey("dBm"))
+                                {
+                                    if (datas[5] == vals[0])
+                                        map.Add("dBm", vals[0].Trim());
+                                }
+                                if (!map.ContainsKey("tac"))
+                                {
+                                    if (datas[10] == vals[0])
+                                        map.Add("tac", hexToInteger(vals[0].Trim()));
+                                }
+                                if (!map.ContainsKey("net"))
+                                {
+                                    if (datas[0].Contains("NR5G"))
+                                        map.Add("net", "5G");
+                                    if (datas[0].Contains("LTE"))
+                                        map.Add("net", "4G");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
+                    }
+
+                    else if (a == "3G")
                     {
                         // +QENG: "servingcell","LIMSRV","WCDMA",404,59,1C21,13DA00C,10732,114,42,-67,-8,-,-,-,-,- AT+QENG=\"servingcell\
                         //In WCDMA mode:
@@ -3845,7 +5738,7 @@ namespace CligenceCellIDGrabber
                                     map.Add("net", "3G");
                                 }
                                 // row["(A/E/U)RFCN"] = map["arfcn"];
-                                // row["ENB"] = map["dBm"];
+                                // row["ENB"] = map["dBm"];btn
                                 // row["ECI"] = map["cellid"];
                                 // row["Network Type"] = map["net"];
                                 // row["BSIC/PSC/PCI"] = map["bsic"];
@@ -3857,455 +5750,653 @@ namespace CligenceCellIDGrabber
                             }
                         }
                     }
-                }
 
-
-            }
-            return map;
-        }
-        public List<Dictionary<string, string>> clean(String[] lines)
-        {
-            List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
-            Dictionary<string, string> dict;
-            foreach (var line in lines)
-            {
-                if (line.Trim().ToUpper().Contains("OK"))
-                {
-                    Countok++;
-                    // count
-                    lockk = false;
-                    serialWrite(null);
-                    break;
-                }
-
-                if (line.Contains("Network survey end") && selectedMode == "Spot")
-                {
-                    //count2G++;
-                }
-
-                else if (line.Contains("ERROR"))
-                {
-                    Countok++;
-                    //MessageBox.Show("Error");
-                    lockk = false;
-                    serialWrite(null);
-                    break;
-                }
-                if (line.Trim().Contains("Loop"))
-                {
-                    lockk = false;
-                    serialWrite(null);
-                    break;
-                }
-                dict = dataCleaner(line);
-                if (dict != null)
-                {
-                    list.Add(dict);
-                }
-            }
-            return list;
-        }
-
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-            //if (net != "")
-            //{
-            //    var backgroundWorker = sender as BackgroundWorker;
-            //    ////for (int j = 0; j < 100000; j++)
-            //    ////{
-            //    ////    double pow = Math.Pow(j, j);
-            //    ////    backgroundWorker.ReportProgress((j * 100) / 100000);
-            //    ////}
-            //}
-            //lblRegion.Invoke((MethodInvoker)delegate
-            //{
-            //    lblRegion.Text = "Region : Searching Region ...";
-            //});
-            //if (region == "NA")
-            //{
-            //    getRegion();
-            //}
-        }
-        private void regionloader_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            try
-            {
-                this.Progrsbr.Value = e.ProgressPercentage;
-            }
-            catch (Exception ex)
-            { }
-        }
-
-        private void regionloader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            try
-            {
-                // MessageBox.Show("Region Selected");
-                serialPort2.Close();
-
-                serialPort2.Open();
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-        private string srport()
-        {
-            try
-            {
-                if (serialPort2 != null)
-                {
-                    if (serialPort2.IsOpen)
+                    else if (a == "ALL")
                     {
-                        serialPort2.BaseStream.Dispose();
-                    }
-                    serialPort2.Dispose();
-                    //serialPort2 = null;
-                }
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startinfo = new System.Diagnostics.ProcessStartInfo();
-                startinfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startinfo.FileName = "cmd.exe";
-                // string newStr = "\"" + "AT Port" + "\"";
-                // string s = @"/c wmic path win32_pnpentity get caption /format:table |find ""AT Port""";
-                // newStr = "/c wmic path win32_pnpentity get caption /format:table |find " + newStr;
-                //startinfo.Arguments = "/c wmic path win32_pnpentity get caption /format:table |find " + "''"AT Port"";
-                //startinfo.Arguments = String.Concat("/c wmic path win32_pnpentity get caption /format:table |find ", "\"", "AT Port");
-                //string txt = (@"""Add doublequotes""").Replace("\\", ""); 
-                startinfo.Arguments = "/c wmic path win32_pnpentity get caption /format:table  <NUL";
-                process.StartInfo = startinfo;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardInput = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.Start();
-                string ot = process.StandardOutput.ReadToEnd();
-                // File.AppendAllText(outputFile, ot);
-                string port = "";
-                //changes for portfind
-                MachineType = ot.Contains("Quectel USB Modem");
-                string[] readtext = ot.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-                int indexes = Array.FindIndex(readtext, element => element.Contains("AT Port"));
-                if (indexes > 1)
-                {
-                    string portText = readtext[indexes];
+                        if (data.Contains("LTE"))
+                        {
+                            String[] vals = val.Split(':');
 
-                    //changes for portfind
-                    string subport = portText.Substring(portText.LastIndexOf('(') + 1, portText.LastIndexOf(')'));
-                    port = subport.Replace(")", "");
-                    serialPort2.PortName = port.Trim();
-                    serialPort2.BaudRate = 115200;
-                    Thread.Sleep(1000);
-                    //serialPort2.Parity = Parity.None;
-                    //serialPort2.DataBits = 8;
-                    //serialPort2.StopBits = StopBits.One;
-                    serialPort2.Open();
-                }
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-            return port;
-        }
-
-        private void DdlMode_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            List<TypeText> TypeList = new List<TypeText>();
-            TypeList.Clear();
-
-            TypeText selectedNetwork = DdlMode.SelectedItem as TypeText;
-            a = selectedNetwork.Name;
-            // wmic path win32_pnpentity get caption /format:table |find "AT Port"
-            if ((selectedNetwork.Name.ToString() == "Route")) //|| (DdlMode.SelectedItem.ToString() == "Spot"))
-            {
-                Progrsbr.Invoke((MethodInvoker)delegate
-                {
-                    Progrsbr.Visible = false;
-                });
-                TypeList.Add(new TypeText { Name = "Select" });
-                TypeList.Add(new TypeText { Name = "3G" });
-                TypeList.Add(new TypeText { Name = "4G" });
-                TypeList.Add(new TypeText { Name = "5G" });
-                TypeList.Add(new TypeText { Name = "4G + 5G" });
-                TypeList.Add(new TypeText { Name = "ALL" });
-                metroComboBox1.Enabled = true;
-                metroComboBox1.DataSource = TypeList;
-                metroComboBox1.DisplayMember = "Name";
-                cmbMode.Enabled = false;
-
-            }
-            else if ((selectedNetwork.Name.ToString() == "Spot")) //|| (DdlMode.SelectedItem.ToString() == "Spot"))
-            {
-                Progrsbr.Invoke((MethodInvoker)delegate
-                {
-                    Progrsbr.Visible = true;
-                });
-                TypeList.Add(new TypeText { Name = "Select" });
-                TypeList.Add(new TypeText { Name = "3G" });
-                TypeList.Add(new TypeText { Name = "4G" });
-                TypeList.Add(new TypeText { Name = "5G" });
-                TypeList.Add(new TypeText { Name = "4G + 5G" });
-                TypeList.Add(new TypeText { Name = "ALL" });
-                metroComboBox1.Enabled = true;
-                metroComboBox1.DataSource = TypeList;
-                metroComboBox1.DisplayMember = "Name";
-                metroComboBox1.ValueMember = "Name";
-                cmbMode.Enabled = true;
-            }
-        }
-        private void cmbMode_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            List<TypeText> TypeList = new List<TypeText>();
-            TypeList.Clear();
-            if (cmbMode.SelectedItem.ToString() == "Deep")
-            {
-                TypeList.Add(new TypeText { Name = "Select" });
-                TypeList.Add(new TypeText { Name = "Spot" });
-
-                DdlMode.Enabled = true;
-                DdlMode.DataSource = TypeList;
-                DdlMode.DisplayMember = "Name";
-            }
-            else if (cmbMode.SelectedItem.ToString() == "Fast")
-            {
-                TypeList.Add(new TypeText { Name = "Select" });
-                TypeList.Add(new TypeText { Name = "Spot" });
-                TypeList.Add(new TypeText { Name = "Route" });
-                DdlMode.Enabled = true;
-                DdlMode.DataSource = TypeList;
-                DdlMode.DisplayMember = "Name";
-            }
-        }
-
-        private void timer_Tick(object sender, EventArgs e)
-        {
-            lblDate.Text = System.DateTime.Now.ToString();
-        }
-        //  [STAThread]
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                if (dt.Rows.Count > 0)
-                {
-                    try
-                    {
-                        string folderPath = "";
-                        //Thread t = new Thread((ThreadStart)(() =>
-                        //{
-
-                        // wmic path win32_pnpentity get caption /format:table |find "AT Port"
-                        //Exporting to Excel
-                        //try
-                        //{
-                        //  var dr = sfdExcel.ShowDialog();
-                        //sfdExcel.ShowDialog();
-                        // folderPath = sfdExcel.FileName;
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    MessageBox.Show(ex.Message.ToString());
-                        //}
-                        DataTable tblFilteredJio = new DataTable();
-                        DataTable tblFilteredAirtel = new DataTable();
-                        DataTable tblFilteredVodafoneIdea = new DataTable();
-                        DataTable tblFilteredCellone = new DataTable();
-                        DataTable tblother = new DataTable();
-                        DataTable tblAll = new DataTable();
-                        DataSet ds = new DataSet();
-                        tblAll = dt.AsEnumerable().CopyToDataTable();
-                        ds.Tables.Add(tblAll);
-                        string[] tabName = { "All", "Jio", "Airtel", "Vodafone Idea","Cellone", "Other" };
-                        try
-                        {
-                            tblFilteredJio = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Jio").CopyToDataTable();
-                            ds.Tables.Add(tblFilteredJio);
-                        }
-                        catch (Exception ex)
-                        {
-                            ds.Tables.Add(tblFilteredJio);
-                        }
-                        try
-                        {
-                            tblFilteredAirtel = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Airtel").CopyToDataTable();
-                            ds.Tables.Add(tblFilteredAirtel);
-                        }
-                        catch (Exception ex)
-                        {
-                            ds.Tables.Add(tblFilteredAirtel);
-                        }
-                        try
-                        {
-                            tblFilteredVodafoneIdea = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Vodafone Idea").CopyToDataTable();
-                            ds.Tables.Add(tblFilteredVodafoneIdea);
-                        }
-                        catch (Exception ex)
-                        {
-                            ds.Tables.Add(tblFilteredVodafoneIdea);
-                        }
-                        try
-                        {
-                            tblFilteredCellone = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Cellone").CopyToDataTable();
-                            ds.Tables.Add(tblFilteredCellone);
-                        }
-                        catch (Exception ex)
-                        {
-                            ds.Tables.Add(tblFilteredCellone);
-                        }
-                        try
-                        {
-                            tblother = dt.AsEnumerable()
-                                   .Where(r => r.Field<string>("Operator Name") != "Airtel")
-                                   .Where(r => r.Field<string>("Operator Name") != "Jio")
-                                   .Where(x => x.Field<string>("Operator Name") != "Vodafone Idea")
-                                   .Where(x => x.Field<string>("Operator Name") != "Cellone")
-                                   .CopyToDataTable();
-                            ds.Tables.Add(tblother);
-                        }
-                        catch (Exception ex)
-                        {
-                            ds.Tables.Add(tblother);
-                        }
-                        try
-                        {
-                            folderPath = GetfileData();
-                            using (XLWorkbook wb = new XLWorkbook())
+                            if (!map.ContainsKey(vals[0]))
                             {
-                                for (int i = 0; i < ds.Tables.Count; i++)
+                                try
                                 {
-                                    wb.Worksheets.Add(ds.Tables[i], tabName[i].ToString());
-                                    wb.SaveAs(folderPath);
+                                    if (!map.ContainsKey("mcc"))
+                                    {
+                                        if (datas[1] == vals[0])
+                                            map.Add("mcc", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("mnc"))
+                                    {
+                                        if (datas[2] == vals[0])
+                                            map.Add("mnc", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("lac"))
+                                    {
+                                        if (datas[10] == vals[0])
+                                            map.Add("lac", hexToInteger(vals[0].Trim()));
+                                    }
+                                    if (!map.ContainsKey("arfcn"))
+                                    {
+                                        if (datas[3] == vals[0])
+                                            map.Add("arfcn", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("bsic"))
+                                    {
+                                        if (datas[4] == vals[0])
+                                            map.Add("bsic", vals[0].Trim());
+                                    }
+
+                                    if (!map.ContainsKey("dBm"))
+                                    {
+                                        if (datas[5] == vals[0])
+                                            map.Add("dBm", vals[0].Trim());
+                                    }
+
+                                    if (!map.ContainsKey("cellid"))
+                                    {
+                                        if (datas[9] == vals[0])
+                                            map.Add("cellid", hexToInteger(vals[0].Trim()));
+                                    }
+                                    if (!map.ContainsKey("tac"))
+                                    {
+                                        if (datas[10] == vals[0])
+                                            map.Add("tac", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("net"))
+                                    {
+                                        if (datas[0].Contains("NR5G"))
+                                            map.Add("net", "5G");
+                                        if (datas[0].Contains("LTE"))
+                                            map.Add("net", "4G");
+                                    }
+
+                                }
+                                catch (Exception ex)
+                                {
+
                                 }
                             }
+                        }
+
+                        else if (data.Contains("NR5G"))
+                        {
+                            String[] vals = val.Split(':');
+
+                            if (!map.ContainsKey(vals[0]))
+                            {
+                                try
+                                {
+                                    if (!map.ContainsKey("mcc"))
+                                    {
+                                        if (datas[1] == vals[0])
+                                            map.Add("mcc", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("mnc"))
+                                    {
+                                        if (datas[2] == vals[0])
+                                            map.Add("mnc", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("lac"))
+                                    {
+                                        if (datas[10] == vals[0])
+                                            map.Add("lac", hexToInteger(vals[0].Trim()));
+                                    }
+                                    if (!map.ContainsKey("cellid"))
+                                    {
+                                        if (datas[9] == vals[0])
+                                            map.Add("cellid", hexToInteger(vals[0].Trim()));
+                                    }
+                                    if (!map.ContainsKey("arfcn"))
+                                    {
+                                        if (datas[3] == vals[0])
+                                            map.Add("arfcn", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("bsic"))
+                                    {
+                                        if (datas[4] == vals[0])
+                                            map.Add("bsic", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("dBm"))
+                                    {
+                                        if (datas[5] == vals[0])
+                                            map.Add("dBm", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("tac"))
+                                    {
+                                        if (datas[10] == vals[0])
+                                            map.Add("tac", hexToInteger(vals[0].Trim()));
+                                    }
+                                    if (!map.ContainsKey("net"))
+                                    {
+                                        if (datas[0].Contains("NR5G"))
+                                            map.Add("net", "5G");
+                                        if (datas[0].Contains("LTE"))
+                                            map.Add("net", "4G");
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // +QENG: "servingcell","LIMSRV","WCDMA",404,59,1C21,13DA00C,10732,114,42,-67,-8,-,-,-,-,- AT+QENG=\"servingcell\
+                            //In WCDMA mode:
+                            //+QENG:"servingcell",<state>,"WCDMA",<MCC>,<MNC>,<LAC>,<cellID>,<uarfcn>,<PSC>,<RAC>,<RSCP>,<ecio>,<phych>,<SF>,<slot>,<speech_code>,<comMod>
+                            //                        0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+                            String[] vals = val.Split(':');
+
+                            if (!map.ContainsKey(vals[0]))
+                            {
+                                try
+                                {
+                                    if (!map.ContainsKey("mcc"))
+                                    {
+                                        if (datas[3] == vals[0])
+                                            map.Add("mcc", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("mnc"))
+                                    {
+                                        if (datas[4] == vals[0])
+                                            map.Add("mnc", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("lac"))
+                                    {
+                                        if (datas[5] == vals[0])
+                                            map.Add("lac", hexToInteger(vals[0].Trim()));
+                                    }
+                                    if (!map.ContainsKey("cellid"))
+                                    {
+                                        if (datas[6] == vals[0])
+                                            map.Add("cellid", hexToInteger(vals[0].Trim()));
+                                    }
+                                    if (!map.ContainsKey("arfcn"))
+                                    {
+                                        if (datas[7] == vals[0])
+                                            map.Add("arfcn", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("bsic"))
+                                    {
+                                        if (datas[8] == vals[0])
+                                            map.Add("bsic", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("tac"))
+                                    {
+                                        if (datas[5] == vals[0])
+                                            map.Add("tac", vals[0].Trim());
+                                    }
+                                    if (!map.ContainsKey("dBm"))
+                                    {
+                                        if (datas[10] == vals[0])
+                                            map.Add("dBm", hexToInteger(vals[0].Trim()));
+                                    }
+                                    if (!map.ContainsKey("net"))
+                                    {
+                                        map.Add("net", "3G");
+                                    }
+                                    // row["(A/E/U)RFCN"] = map["arfcn"];
+                                    // row["ENB"] = map["dBm"];
+                                    // row["ECI"] = map["cellid"];
+                                    // row["Network Type"] = map["net"];
+                                    // row["BSIC/PSC/PCI"] = map["bsic"];
+                                    //row["DBM"] = map["dBm"];
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+                return map;
+            }
+            public List<Dictionary<string, string>> clean(String[] lines)
+            {
+                List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
+                Dictionary<string, string> dict;
+                foreach (var line in lines)
+                {
+                    if (line.Trim().ToUpper().Contains("OK"))
+                    {
+                        Countok++;
+                        // count
+                        lockk = false;
+                        serialWrite(null);
+                        break;
+                    }
+
+                    if (line.Contains("Network survey end") && selectedMode == "Spot")
+                    {
+                        //count2G++;
+                    }
+
+                    else if (line.Contains("ERROR"))
+                    {
+                        Countok++;
+                        //MessageBox.Show("Error");
+                        lockk = false;
+                        serialWrite(null);
+                        break;
+                    }
+                    if (line.Trim().Contains("Loop"))
+                    {
+                        lockk = false;
+                        serialWrite(null);
+                        break;
+                    }
+                    dict = dataCleaner(line);
+                    if (dict != null)
+                    {
+                        list.Add(dict);
+                    }
+                }
+                return list;
+            }
+
+            private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+            {
+                //if (net != "")
+                //{
+                //    var backgroundWorker = sender as BackgroundWorker;
+                //    ////for (int j = 0; j < 100000; j++)
+                //    ////{
+                //    ////    double pow = Math.Pow(j, j);
+                //    ////    backgroundWorker.ReportProgress((j * 100) / 100000);
+                //    ////}
+                //}
+                //lblRegion.Invoke((MethodInvoker)delegate
+                //{
+                //    lblRegion.Text = "Region : Searching Region ...";
+                //});
+                //if (region == "NA")
+                //{
+                //    getRegion();
+                //}
+            }
+            private void regionloader_ProgressChanged(object sender, ProgressChangedEventArgs e)
+            {
+                try
+                {
+                    this.Progrsbr.Value = e.ProgressPercentage;
+                }
+                catch (Exception ex)
+                { }
+            }
+
+            private void regionloader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+            {
+                try
+                {
+                    // MessageBox.Show("Region Selected");
+                    serialPort2.Close();
+
+                    serialPort2.Open();
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            private string srport()
+            {
+                try
+                {
+                    if (serialPort2 != null)
+                    {
+                        if (serialPort2.IsOpen)
+                        {
+                            serialPort2.BaseStream.Dispose();
+                        }
+                        serialPort2.Dispose();
+                        //serialPort2 = null;
+                    }
+                    System.Diagnostics.Process process = new System.Diagnostics.Process();
+                    System.Diagnostics.ProcessStartInfo startinfo = new System.Diagnostics.ProcessStartInfo();
+                    startinfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                    startinfo.FileName = "cmd.exe";
+                    // string newStr = "\"" + "AT Port" + "\"";
+                    // string s = @"/c wmic path win32_pnpentity get caption /format:table |find ""AT Port""";
+                    // newStr = "/c wmic path win32_pnpentity get caption /format:table |find " + newStr;
+                    //startinfo.Arguments = "/c wmic path win32_pnpentity get caption /format:table |find " + "''"AT Port"";
+                    //startinfo.Arguments = String.Concat("/c wmic path win32_pnpentity get caption /format:table |find ", "\"", "AT Port");
+                    //string txt = (@"""Add doublequotes""").Replace("\\", ""); 
+                    startinfo.Arguments = "/c wmic path win32_pnpentity get caption /format:table  <NUL";
+                    process.StartInfo = startinfo;
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardInput = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.Start();
+                    string ot = process.StandardOutput.ReadToEnd();
+                    // File.AppendAllText(outputFile, ot);
+                    string port = "";
+                    //changes for portfind
+                    MachineType = ot.Contains("Quectel USB Modem");
+                    string[] readtext = ot.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+                    int indexes = Array.FindIndex(readtext, element => element.Contains("AT Port"));
+                    if (indexes > 1)
+                    {
+                        string portText = readtext[indexes];
+
+                        //changes for portfind
+                        string subport = portText.Substring(portText.LastIndexOf('(') + 1, portText.LastIndexOf(')'));
+                        port = subport.Replace(")", "");
+                        serialPort2.PortName = port.Trim();
+                        serialPort2.BaudRate = 115200;
+                        Thread.Sleep(1000);
+                        //serialPort2.Parity = Parity.None;
+                        //serialPort2.DataBits = 8;
+                        //serialPort2.StopBits = StopBits.One;
+                        serialPort2.Open();
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+                return port;
+            }
+
+            private void DdlMode_SelectedIndexChanged(object sender, EventArgs e)
+            {
+                List<TypeText> TypeList = new List<TypeText>();
+                TypeList.Clear();
+
+                TypeText selectedNetwork = DdlMode.SelectedItem as TypeText;
+                a = selectedNetwork.Name;
+                // wmic path win32_pnpentity get caption /format:table |find "AT Port"
+                if ((selectedNetwork.Name.ToString() == "Route")) //|| (DdlMode.SelectedItem.ToString() == "Spot"))
+                {
+                    Progrsbr.Invoke((MethodInvoker)delegate
+                    {
+                        Progrsbr.Visible = false;
+                    });
+                    TypeList.Add(new TypeText { Name = "Select" });
+                    TypeList.Add(new TypeText { Name = "3G" });
+                    TypeList.Add(new TypeText { Name = "4G" });
+                    TypeList.Add(new TypeText { Name = "5G" });
+                    TypeList.Add(new TypeText { Name = "4G + 5G" });
+                    TypeList.Add(new TypeText { Name = "ALL" });
+                    metroComboBox1.Enabled = true;
+                    metroComboBox1.DataSource = TypeList;
+                    metroComboBox1.DisplayMember = "Name";
+                    cmbMode.Enabled = false;
+
+                }
+                else if ((selectedNetwork.Name.ToString() == "Spot")) //|| (DdlMode.SelectedItem.ToString() == "Spot"))
+                {
+                    Progrsbr.Invoke((MethodInvoker)delegate
+                    {
+                        Progrsbr.Visible = true;
+                    });
+                    TypeList.Add(new TypeText { Name = "Select" });
+                    TypeList.Add(new TypeText { Name = "3G" });
+                    TypeList.Add(new TypeText { Name = "4G" });
+                    TypeList.Add(new TypeText { Name = "5G" });
+                    TypeList.Add(new TypeText { Name = "4G + 5G" });
+                    TypeList.Add(new TypeText { Name = "ALL" });
+                    metroComboBox1.Enabled = true;
+                    metroComboBox1.DataSource = TypeList;
+                    metroComboBox1.DisplayMember = "Name";
+                    metroComboBox1.ValueMember = "Name";
+                    cmbMode.Enabled = true;
+                }
+            }
+            private void cmbMode_SelectedIndexChanged(object sender, EventArgs e)
+            {
+                List<TypeText> TypeList = new List<TypeText>();
+                TypeList.Clear();
+                if (cmbMode.SelectedItem.ToString() == "Deep")
+                {
+                    TypeList.Add(new TypeText { Name = "Select" });
+                    TypeList.Add(new TypeText { Name = "Spot" });
+
+                    DdlMode.Enabled = true;
+                    DdlMode.DataSource = TypeList;
+                    DdlMode.DisplayMember = "Name";
+                }
+                else if (cmbMode.SelectedItem.ToString() == "Fast")
+                {
+                    TypeList.Add(new TypeText { Name = "Select" });
+                    TypeList.Add(new TypeText { Name = "Spot" });
+                    TypeList.Add(new TypeText { Name = "Route" });
+                    DdlMode.Enabled = true;
+                    DdlMode.DataSource = TypeList;
+                    DdlMode.DisplayMember = "Name";
+                }
+            }
+
+            private void timer_Tick(object sender, EventArgs e)
+            {
+                lblDate.Text = System.DateTime.Now.ToString();
+            }
+            //  [STAThread]
+            private void btnSave_Click(object sender, EventArgs e)
+            {
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    if (dt.Rows.Count > 0)
+                    {
+                        try
+                        {
+                            string folderPath = "";
+                            //Thread t = new Thread((ThreadStart)(() =>
+                            //{
+
+                            // wmic path win32_pnpentity get caption /format:table |find "AT Port"
+                            //Exporting to Excel
+                            //try
+                            //{
+                            //  var dr = sfdExcel.ShowDialog();
+                            //sfdExcel.ShowDialog();
+                            // folderPath = sfdExcel.FileName;
+                            //}
+                            //catch (Exception ex)
+                            //{
+                            //    MessageBox.Show(ex.Message.ToString());
+                            //}
+                            DataTable tblFilteredJio = new DataTable();
+                            DataTable tblFilteredAirtel = new DataTable();
+                            DataTable tblFilteredVodafoneIdea = new DataTable();
+                            DataTable tblFilteredCellone = new DataTable();
+                            DataTable tblother = new DataTable();
+                            DataTable tblAll = new DataTable();
+                            DataSet ds = new DataSet();
+                            tblAll = dt.AsEnumerable().CopyToDataTable();
+                            ds.Tables.Add(tblAll);
+                            string[] tabName = { "All", "Jio", "Airtel", "Vodafone Idea", "Cellone", "Other" };
+                            try
+                            {
+                                tblFilteredJio = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Jio").CopyToDataTable();
+                                ds.Tables.Add(tblFilteredJio);
+                            }
+                            catch (Exception ex)
+                            {
+                                ds.Tables.Add(tblFilteredJio);
+                            }
+                            try
+                            {
+                                tblFilteredAirtel = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Airtel").CopyToDataTable();
+                                ds.Tables.Add(tblFilteredAirtel);
+                            }
+                            catch (Exception ex)
+                            {
+                                ds.Tables.Add(tblFilteredAirtel);
+                            }
+                            try
+                            {
+                                tblFilteredVodafoneIdea = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Vodafone Idea").CopyToDataTable();
+                                ds.Tables.Add(tblFilteredVodafoneIdea);
+                            }
+                            catch (Exception ex)
+                            {
+                                ds.Tables.Add(tblFilteredVodafoneIdea);
+                            }
+                            try
+                            {
+                                tblFilteredCellone = dt.AsEnumerable().Where(r => r.Field<string>("Operator Name") == "Cellone").CopyToDataTable();
+                                ds.Tables.Add(tblFilteredCellone);
+                            }
+                            catch (Exception ex)
+                            {
+                                ds.Tables.Add(tblFilteredCellone);
+                            }
+                            try
+                            {
+                                tblother = dt.AsEnumerable()
+                                       .Where(r => r.Field<string>("Operator Name") != "Airtel")
+                                       .Where(r => r.Field<string>("Operator Name") != "Jio")
+                                       .Where(x => x.Field<string>("Operator Name") != "Vodafone Idea")
+                                       .Where(x => x.Field<string>("Operator Name") != "Cellone")
+                                       .CopyToDataTable();
+                                ds.Tables.Add(tblother);
+                            }
+                            catch (Exception ex)
+                            {
+                                ds.Tables.Add(tblother);
+                            }
+                            try
+                            {
+                                folderPath = GetfileData();
+                                using (XLWorkbook wb = new XLWorkbook())
+                                {
+                                    for (int i = 0; i < ds.Tables.Count; i++)
+                                    {
+                                        wb.Worksheets.Add(ds.Tables[i], tabName[i].ToString());
+                                        wb.SaveAs(folderPath);
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message.ToString());
+                            }
+                            MessageBox.Show("File successfully saved on below Path" + Environment.NewLine + folderPath);
+                            //}));
+                            System.Diagnostics.Process.Start(folderPath);
+                            //// Run your code from a thread that joins the STA Thread
+                            //t.SetApartmentState(ApartmentState.STA);
+                            //t.Start();
+                            //t.Join();
+                            //Export2Excel(dt, net);
                         }
                         catch (Exception ex)
                         {
                             MessageBox.Show(ex.Message.ToString());
                         }
-                        MessageBox.Show("File successfully saved on below Path" + Environment.NewLine + folderPath);
-                        //}));
-                        System.Diagnostics.Process.Start(folderPath);
-                        //// Run your code from a thread that joins the STA Thread
-                        //t.SetApartmentState(ApartmentState.STA);
-                        //t.Start();
-                        //t.Join();
-                        //Export2Excel(dt, net);
+
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No data found");
+                }
+            }
+            #region MyRegion
+            public string GetfileData()
+            {
+                string filepath = "";
+
+                var dir = @"C:\CligenceExcel";  // folder location
+                filepath = "C:\\CligenceExcel\\" + DateTime.Now.ToString("yyyyMMdd_hhmmss") + "-CligenceExcelReport" + ".xlsx";
+
+                // folder location
+                //  var directoryInfo = new DirectoryInfo("C:\\Sys\\");
+
+                if (!Directory.Exists(dir))
+                {
+                    // if it doesn't exist, create
+                    try
+                    {
+                        Directory.CreateDirectory(dir);
+
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.Message.ToString());
+                        MessageBox.Show(ex.Message);
                     }
-
                 }
+
+                return filepath;
+
+
+
             }
-            else
+            #endregion
+            public bool FileExists(string fileName)
             {
-                MessageBox.Show("No data found");
+                var dir = @"C:\CligenceExcel";
+                var workingDirectory = dir;
+                var file = $"{workingDirectory}\\{fileName}";
+                return File.Exists(file);
             }
-        }
-        #region MyRegion
-        public string GetfileData()
-        {
-            string filepath = "";
 
-            var dir = @"C:\CligenceExcel";  // folder location
-             filepath = "C:\\CligenceExcel\\" + DateTime.Now.ToString("yyyyMMdd_hhmmss") + "-CligenceExcelReport" + ".xlsx";
-
-            // folder location
-            //  var directoryInfo = new DirectoryInfo("C:\\Sys\\");
-
-            if (!Directory.Exists(dir))
+            [STAThread]
+            public void Export2Excel(DataTable dt, string fileName)
             {
-                // if it doesn't exist, create
                 try
                 {
-                    Directory.CreateDirectory(dir);
+                    DialogResult dr = sfdExcel.ShowDialog();
+                    // wmic path win32_pnpentity get caption /format:table |find "AT Port"
+                    //Exporting to Excel
+                    string folderPath = sfdExcel.FileName;
+                    //if (!Directory.Exists(folderPath))
+                    //{
+                    //    Directory.CreateDirectory(folderPath);
+                    //}
+                    using (XLWorkbook wb = new XLWorkbook())
+                    {
+                        //for (int row = 0; row < dt.Rows.Count; row++)
+                        //{
+                        wb.Worksheets.Add(dt, fileName);
+                        //  }
+
+                        wb.SaveAs(folderPath);
+                    }
+
 
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
-                }
-            }
-
-                return  filepath;
-
-
-
-        }
-        #endregion
-        public bool FileExists(string fileName)
-        {
-            var dir = @"C:\CligenceExcel";
-            var workingDirectory = dir;
-            var file = $"{workingDirectory}\\{fileName}";
-            return File.Exists(file);
-        }
-
-        [STAThread]
-        public void Export2Excel(DataTable dt, string fileName)
-        {
-            try
-            {
-                DialogResult dr = sfdExcel.ShowDialog();
-                // wmic path win32_pnpentity get caption /format:table |find "AT Port"
-                //Exporting to Excel
-                string folderPath = sfdExcel.FileName;
-                //if (!Directory.Exists(folderPath))
-                //{
-                //    Directory.CreateDirectory(folderPath);
-                //}
-                using (XLWorkbook wb = new XLWorkbook())
-                {
-                    //for (int row = 0; row < dt.Rows.Count; row++)
-                    //{
-                    wb.Worksheets.Add(dt, fileName);
-                    //  }
-
-                    wb.SaveAs(folderPath);
+                    MessageBox.Show(ex.Message.ToString());
                 }
 
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString());
             }
 
-        }
-
-        private void metroComboBox1_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            TypeText selectedPerson = metroComboBox1.SelectedItem as TypeText;
-            String a = selectedPerson.Name;
-        }
-
-        private void btnClear_Click(object sender, EventArgs e)
-        {
-            if (lockk == false)
+            private void metroComboBox1_SelectionChangeCommitted(object sender, EventArgs e)
             {
-                dt.Clear();
-                scannedCellId.Clear();
-                //metroGrid1.Rows.Clear();
-                metroGrid1.DataSource = null;
-                Progrsbr.Invoke((MethodInvoker)delegate
+                TypeText selectedPerson = metroComboBox1.SelectedItem as TypeText;
+                String a = selectedPerson.Name;
+            }
+
+            private void btnClear_Click(object sender, EventArgs e)
+            {
+                if (lockk == false)
                 {
+                    dt.Clear();
+                    scannedCellId.Clear();
+                    //metroGrid1.Rows.Clear();
+                    metroGrid1.DataSource = null;
+                    Progrsbr.Invoke((MethodInvoker)delegate
+                    {
                     // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
                     Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
                     Progrsbr.Value = Progrsbr.Minimum;
-                    Progrsbr.Value = 0;
+                        Progrsbr.Value = 0;
 
-                });
-                //  metroComboBox1.Enabled = false;
-            }
-            else
-            {
-                MessageBox.Show("Command is in progress, Please try again later.");
+                    });
+                    //  metroComboBox1.Enabled = false;
+                }
+                else
+                {
+                    MessageBox.Show("Command is in progress, Please try again later.");
 
+                }
             }
-        }
 
 
         private static readonly HttpClient client = new HttpClient();
@@ -4451,14 +6542,3 @@ namespace CligenceCellIDGrabber
     }
 
 }
-//public class ProductKeyValidation
-//{
-//    public string status { get; set; }
-//    public string error { get; set; }
-//}
-
-//public class TypeText1
-//{
-//    public string Name { get; set; }
-
-//}
