@@ -1372,7 +1372,6 @@ namespace CligenceCellIDGrabber
                             // await Task.Run(() => 
                             serialWrite("AT+CMSSN");//);
                             Thread.Sleep(100);
-
                         }
                         try
                         {

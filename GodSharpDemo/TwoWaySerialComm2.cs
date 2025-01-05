@@ -442,6 +442,7 @@ namespace GodSharpDemo
 
         // Used to close the handle to the serial port.
         [DllImport("kernel32.dll", SetLastError = true)]
+
         static extern bool CloseHandle(IntPtr hObject);
 
         // Used to get the state of the serial port so that we can configure it.

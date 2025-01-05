@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CligenceCellIDGrabber.Properties {
+namespace CligenceCellIDGrabber2G5G.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

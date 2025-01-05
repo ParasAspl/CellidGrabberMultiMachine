@@ -30,7 +30,7 @@ namespace CligenceCellIDGrabber
         private void InitializeComponent()
         {
             this.txtActivationKey = new MetroFramework.Controls.MetroTextBox();
-            this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
+          //  this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.btnActivate = new MetroFramework.Controls.MetroButton();
             this.SuspendLayout();
             // 

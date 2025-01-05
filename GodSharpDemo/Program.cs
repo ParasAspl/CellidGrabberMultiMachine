@@ -45,6 +45,7 @@ namespace CligenceCellIDGrabber
                 {
                     MNC_MCC.Message = "This software is licensed to Product key : " + key[0];
                 }
+
                 Dictionary<string, string> postData = new Dictionary<string, string>();
                 postData.Add("key", key[0]);//"62220182b8deb" 64e72a5c4a8fa
                
@@ -57,6 +58,7 @@ namespace CligenceCellIDGrabber
                         MessageBox.Show(result.ToString());
                        // Application.Run(new ActivationForm());
                         return;
+
                     }
                 }
                 if (isActive)
@@ -201,7 +203,6 @@ namespace CligenceCellIDGrabber
                 //  {\\DESKTOP - 181DVKB\root\cimv2: Win32_BaseBoard.Tag = "Base Board"}
                 motherBoard = motherBoard + (string)mo["SerialNumber"];
             }
-
             string uniqueSystemId = id + motherBoard;
             return uniqueSystemId;
         }

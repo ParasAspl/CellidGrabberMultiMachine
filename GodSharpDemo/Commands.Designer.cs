@@ -66,6 +66,7 @@ namespace CligenceCellIDGrabber
             this.metroGrid1 = new MetroFramework.Controls.MetroGrid();
             this.lblmsg = new MetroFramework.Controls.MetroLabel();
             this.metroStyleManager1 = new MetroFramework.Components.MetroStyleManager(this.components);
+            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             timer = new System.Windows.Forms.Timer(this.components);
             this.metroPanel1.SuspendLayout();
             this.metroPanel2.SuspendLayout();
@@ -192,7 +193,6 @@ namespace CligenceCellIDGrabber
             this.lblRegion.Size = new System.Drawing.Size(57, 19);
             this.lblRegion.TabIndex = 7;
             this.lblRegion.Text = "Region :";
-            this.lblRegion.Visible = false;
             // 
             // lblStatus
             // 
@@ -482,7 +482,7 @@ namespace CligenceCellIDGrabber
             this.lblmsg.FontWeight = MetroFramework.MetroLabelWeight.Regular;
             this.lblmsg.ForeColor = System.Drawing.Color.Black;
             this.lblmsg.Location = new System.Drawing.Point(36, 240);
-            this.lblmsg.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.lblmsg.Margin = new System.Windows.Forms.Padding(3);
             this.lblmsg.Name = "lblmsg";
             this.lblmsg.Size = new System.Drawing.Size(89, 19);
             this.lblmsg.TabIndex = 15;
@@ -496,6 +496,14 @@ namespace CligenceCellIDGrabber
             // metroStyleManager1
             // 
             this.metroStyleManager1.Owner = null;
+            // 
+            // serialPort1
+            // 
+            this.serialPort1.BaudRate = 115200;
+            this.serialPort1.PortName = "None";
+            this.serialPort1.ErrorReceived += new System.IO.Ports.SerialErrorReceivedEventHandler(this.serialPort2_ErrorReceived);
+            this.serialPort1.PinChanged += new System.IO.Ports.SerialPinChangedEventHandler(this.serialPort2_PinChanged);
+            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
             // Commands
             // 
@@ -559,5 +567,6 @@ namespace CligenceCellIDGrabber
         private MetroFramework.Controls.MetroLabel lblmsg;
         private MetroFramework.Controls.MetroProgressBar Progrsbr;
         private MetroFramework.Components.MetroStyleManager metroStyleManager1;
+        private System.IO.Ports.SerialPort serialPort1;
     }
 }

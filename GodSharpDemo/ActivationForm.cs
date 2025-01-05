@@ -158,6 +158,8 @@ namespace CligenceCellIDGrabber
                 // return ex.Message;
             }
         }
+     
+        
         private static readonly HttpClient client = new HttpClient();
         private async Task<string> PostHTTPRequestAsync(string url, Dictionary<string, string> data)
         {
@@ -305,22 +307,6 @@ namespace CligenceCellIDGrabber
             //loResponseStream.Close();
             //// close the response object
             //webresponse.Close();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

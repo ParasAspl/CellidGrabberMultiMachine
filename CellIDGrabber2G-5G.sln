@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cligence Cell ID Grabber", "GodSharpDemo\Cligence Cell ID Grabber.csproj", "{2F4D22E5-3CC9-452B-ACC4-5EDB3AF1F102}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cligence Cell ID Grabber2G-5G", "GodSharpDemo\Cligence Cell ID Grabber2G-5G.csproj", "{2F4D22E5-3CC9-452B-ACC4-5EDB3AF1F102}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

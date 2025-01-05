@@ -6,30 +6,28 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{2F4D22E5-3CC9-452B-ACC4-5EDB3AF1F102}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>CligenceCellIDGrabber</RootNamespace>
-    <AssemblyName>CligenceCellIDGrabber</AssemblyName>
+    <RootNamespace>CligenceCellIDGrabber2G5G</RootNamespace>
+    <AssemblyName>CligenceCellIDGrabber2G-5G</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
-    <PublishUrl>D:\GodSharpDemo5G\Publish\</PublishUrl>
+    <PublishUrl>D:\GodSharpDemo5G\PublishMultiMachines\</PublishUrl>
     <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://cellid.lisw.in/publish/</InstallUrl>
-    <ProductName>Cligence Cell ID Grabber</ProductName>
-    <PublisherName>Cligence Cell ID Grabber</PublisherName>
-    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <ProductName>Cligence Cell ID GrabberV2G-5G</ProductName>
+    <PublisherName>Cligence Cell ID Grabber2G-5G</PublisherName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>111</ApplicationRevision>
+    <ApplicationRevision>114</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
