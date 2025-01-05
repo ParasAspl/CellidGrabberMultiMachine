@@ -7293,7 +7293,7 @@ namespace CligenceCellIDGrabber
                             ds.Tables.Add(tblFilteredAirtel);
                         }
                         catch (Exception ex)
-                        {
+                        { 
                             ds.Tables.Add(tblFilteredAirtel);
                         }
                         try
@@ -7514,7 +7514,6 @@ namespace CligenceCellIDGrabber
             {
                 e.SuppressKeyPress = true;
                 e.Handled = true;
-
                 try
                 {
                     string data = GetSelectedCellsData(metroGrid1);
