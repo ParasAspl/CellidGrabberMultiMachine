@@ -21,7 +21,7 @@ namespace CligenceCellIDGrabber
     public partial class Commands : MetroForm
     {
         private CancellationTokenSource _cancellationTokenSource;
-        string receivedData = "", selectedType="";
+        string receivedData = "", selectedType = "";
         static bool lockk = false, lock2G = false, Iscfub = false;
         //change path
         //string outputFile = "";// @"C:\amar\output.txt";
@@ -84,10 +84,10 @@ namespace CligenceCellIDGrabber
 
             try
             {
-               
+
                 serialPort2.Close();
                 serialPort2.Open();
-               
+
 
                 serialPort1.Close();
                 serialPort1.Open();
@@ -336,6 +336,7 @@ namespace CligenceCellIDGrabber
                 }
                 serialPort1.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
                 serialPort2.DataReceived += new SerialDataReceivedEventHandler(serialPort2_DataReceived);
+                serialPort3.DataReceived += new SerialDataReceivedEventHandler(serialPort3_DataReceived); 
 
                 //await Task.Run(() => serialPort1.DataReceived += serialPort1_DataReceived);
                 //await Task.Run(() => serialPort2.DataReceived += serialPort2_DataReceived);
@@ -389,7 +390,7 @@ namespace CligenceCellIDGrabber
                             TypeText selectedNetwork = metroComboBox1.SelectedItem as TypeText;
                             a = selectedNetwork.Name;
                             net = selectedNetwork.Name.ToString();
-                            selectedType= selectedNetwork.Name.ToString();
+                            selectedType = selectedNetwork.Name.ToString();
                             try
                             {
 
@@ -410,7 +411,7 @@ namespace CligenceCellIDGrabber
                             catch (Exception ex)
                             {
                                 MessageBox.Show("Scan Completed");
-                            }  
+                            }
                         }
                         else
                         {
@@ -617,7 +618,7 @@ namespace CligenceCellIDGrabber
                     }
                     if (Countok > 28 && Countok < 31)
                     {
-                        serialWrite("AT+QSCAN=1,1"); Thread.Sleep(2000); 
+                        serialWrite("AT+QSCAN=1,1"); Thread.Sleep(2000);
                     }
                     if (Countok > 30 && Countok < 33)
                     {
@@ -637,13 +638,13 @@ namespace CligenceCellIDGrabber
                     if (Countok > 35 && Countok < 38)
                     {
                         serialWrite("AT+QSCAN=3,1"); Thread.Sleep(2000);
-                    } 
+                    }
                 }
                 if (Countok > 37 && Countok < 39)
                 {
                     serialWrite(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71");
                     Thread.Sleep(2000);
-                } 
+                }
                 string c33 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
                 //add new cmd
                 string c33n = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
@@ -662,14 +663,14 @@ namespace CligenceCellIDGrabber
                     serialWrite(c33n);
                     Thread.Sleep(2000);
                 }
-                if (Countok > 40 && Countok < 43) 
+                if (Countok > 40 && Countok < 43)
                 {
                     serialWrite(c11);
                     Thread.Sleep(2000);
                 }
                 if (Countok > 42 && Countok < 45)
                 {
-                    serialWrite(c2); 
+                    serialWrite(c2);
                     Thread.Sleep(2000);
                 }
                 int[] bandSs = { 1, 3, 5, 8, 28, 40, 41, 58, 71, 77, 78, 79 };
@@ -697,34 +698,34 @@ namespace CligenceCellIDGrabber
                 if (Countok > 49 && Countok < 55)
                 {
                     if (Countok > 49 && Countok < 51)
-                    { 
+                    {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[1]); Thread.Sleep(2000);
                     }
-                    if (Countok > 50 && Countok < 53) 
+                    if (Countok > 50 && Countok < 53)
                     {
-                        serialWrite(c11); Thread.Sleep(2000); 
+                        serialWrite(c11); Thread.Sleep(2000);
                     }
                     if (Countok > 52 && Countok < 55)
-                    {  
+                    {
                         serialWrite(c2); Thread.Sleep(2000);
-                    } 
-                } 
+                    }
+                }
                 if (Countok > 54 && Countok < 60)
                 {
                     if (Countok > 54 && Countok < 56)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[2]); Thread.Sleep(2000);
-                    } 
+                    }
                     if (Countok > 55 && Countok < 58)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
                     }
                     if (Countok > 57 && Countok < 60)
-                    { 
+                    {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
-                } 
-                if (Countok > 59 && Countok < 65) 
+                }
+                if (Countok > 59 && Countok < 65)
                 {
                     if (Countok > 59 && Countok < 61)
                     {
@@ -733,7 +734,7 @@ namespace CligenceCellIDGrabber
                     if (Countok > 60 && Countok < 63)
                     {
                         serialWrite(c11); Thread.Sleep(2000);
-                    } 
+                    }
                     if (Countok > 62 && Countok < 65)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
@@ -742,7 +743,7 @@ namespace CligenceCellIDGrabber
                 }
                 if (Countok > 64 && Countok < 70)
                 {
-                    if (Countok > 64 && Countok < 66) 
+                    if (Countok > 64 && Countok < 66)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[4]); Thread.Sleep(2000);
                     }
@@ -833,7 +834,7 @@ namespace CligenceCellIDGrabber
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
-                } 
+                }
                 if (Countok > 95 && Countok < 101)
                 {
                     if (Countok > 95 && Countok < 97)
@@ -868,7 +869,7 @@ namespace CligenceCellIDGrabber
                 }
                 //for new band add one by one
 
-                if (Countok > 104 && Countok < 110) 
+                if (Countok > 104 && Countok < 110)
                 {
                     if (Countok > 111 && Countok < 113)
                     {
@@ -891,7 +892,7 @@ namespace CligenceCellIDGrabber
                     }
                     if (Countok > 117 && Countok < 120)
                     {
-                        serialWrite(c11); Thread.Sleep(2000); 
+                        serialWrite(c11); Thread.Sleep(2000);
                     }
                     if (Countok > 119 && Countok < 122)
                     {
@@ -946,13 +947,13 @@ namespace CligenceCellIDGrabber
                 }
                 if (Countok > 146 && Countok < 152)
                 {
-                    if (Countok > 151 && Countok < 153)  
+                    if (Countok > 151 && Countok < 153)
                     {
                         serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[5]); Thread.Sleep(2000);
                     }
                     if (Countok > 152 && Countok < 155)
                     {
-                        serialWrite(c11); Thread.Sleep(4000); 
+                        serialWrite(c11); Thread.Sleep(4000);
                     }
                     if (Countok > 154 && Countok < 157)
                     {
@@ -974,7 +975,7 @@ namespace CligenceCellIDGrabber
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
-                } 
+                }
                 if (Countok > 166 && Countok < 172)
                 {
                     if (Countok > 171 && Countok < 173)
@@ -990,7 +991,7 @@ namespace CligenceCellIDGrabber
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
-                } 
+                }
                 if (Countok > 176 && Countok < 182)
                 {
                     if (Countok > 176 && Countok < 178)
@@ -1006,7 +1007,7 @@ namespace CligenceCellIDGrabber
                         serialWrite(c2); Thread.Sleep(2000);
                     }
 
-                } 
+                }
                 if (Countok > 181 && Countok < 187)
                 {
                     if (Countok > 181 && Countok < 183)
@@ -1019,7 +1020,7 @@ namespace CligenceCellIDGrabber
                     }
                     if (Countok > 184 && Countok < 187)
                     {
-                        serialWrite(c2); Thread.Sleep(2000); 
+                        serialWrite(c2); Thread.Sleep(2000);
                     }
                 }
                 if (Countok > 186 && Countok < 192)
@@ -1029,14 +1030,14 @@ namespace CligenceCellIDGrabber
                         serialWrite(@"AT+QNWPREFCFG=""nsa_nr5g_band""," + bandSs[10]); Thread.Sleep(2000);
                     }
                     if (Countok > 187 && Countok < 190)
-                    { 
+                    {
                         serialWrite(c11); Thread.Sleep(2000);
-                    } 
+                    }
                     if (Countok > 189 && Countok < 192)
                     {
                         serialWrite(c2); Thread.Sleep(2000);
                     }
-                     
+
                 }
                 if (Countok > 191 && Countok < 197)
                 {
@@ -1067,7 +1068,7 @@ namespace CligenceCellIDGrabber
                     serialWrite(c33n);
                     Thread.Sleep(2000);
                 }
-             
+
             }
         }
         //scan 2G
@@ -2672,7 +2673,7 @@ namespace CligenceCellIDGrabber
                     metroComboBox1.Enabled = true;
                     DdlMode.Enabled = true;
                     dt.Clear();
-                    dt=null;
+                    dt = null;
                     MessageBox.Show("Stopped");
                 }
                 catch (Exception ex)
@@ -2813,7 +2814,7 @@ namespace CligenceCellIDGrabber
         {
             try
             {
-               
+
                 if (!serialPort2.IsOpen && !serialPort1.IsOpen)
                 {
                     bool status = establishConnection();
@@ -2863,16 +2864,16 @@ namespace CligenceCellIDGrabber
                 //    }
                 //}
                 //  }
-               
-                 if (serialPort2.IsOpen && serialPort1.IsOpen)
-                    {
+
+                if (serialPort2.IsOpen && serialPort1.IsOpen)
+                {
                     bool status = establishConnection();
                     lblStatus.Text = "Status :Port Connected";
                     DdlMode.Enabled = true;
                     btnSave.Visible = false;
                     btnDisconnect.Visible = true;
                     btnStart.Enabled = true;
-                    
+
                     //if (region == "NA") 
                     //{
                     //    //loader.Visible = true;
@@ -2937,10 +2938,10 @@ namespace CligenceCellIDGrabber
         {
             try
             {
-               
+
                 serialPort2.DtrEnable = true;
                 serialPort2.RtsEnable = true;
-                
+
                 serialPort1.DtrEnable = true;
                 serialPort1.RtsEnable = true;
                 string[] ports = SerialPort.GetPortNames();
@@ -2952,7 +2953,7 @@ namespace CligenceCellIDGrabber
                 try
                 {
                     // SerialPort port = new SerialPort(serialPort2.PortName.Trim(), 115200);
-                   
+
                     SerialPort port = new SerialPort(serialPort2.PortName.Trim(), 115200, Parity.None, 8, StopBits.One);
                     //SerialPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits);
                     port.BaudRate = 115200;
@@ -2960,7 +2961,7 @@ namespace CligenceCellIDGrabber
                     port.Parity = Parity.None;
                     port.DataBits = 8; // Standard data bits
                     port.StopBits = StopBits.One;
-                   
+
                     SerialPort port1 = new SerialPort(serialPort1.PortName.Trim(), 115200, Parity.None, 8, StopBits.One);
                     port1.BaudRate = 115200;
                     port1.Handshake = Handshake.None;
@@ -2976,7 +2977,7 @@ namespace CligenceCellIDGrabber
                     //// port.RtsEnable = true;
                     ///
                     Thread.Sleep(2000);
-                   
+
                     if (!port.IsOpen)
                     {
                         try
@@ -2989,7 +2990,7 @@ namespace CligenceCellIDGrabber
                             Console.WriteLine($"Error opening port: {ex.Message}");
                         }
                     }
-               
+
                     if (!port1.IsOpen)
                     {
                         try
@@ -3026,13 +3027,13 @@ namespace CligenceCellIDGrabber
                 {
                     #region Do uncomment
 
-                    
+
                     //serialPort2.Close();
                     //// serialPort2.Dispose();
                     //Thread.Sleep(2000);
                     //serialPort2.Open();
                     //Thread.Sleep(2000);
-                   
+
                     //serialPort1.Close();
                     //// serialPort2.Dispose();
                     //Thread.Sleep(2000);
@@ -3076,9 +3077,9 @@ namespace CligenceCellIDGrabber
             }
             finally
             {
-               
+
                 MessageBox.Show(serialPort2.IsOpen ? "Successfully 2G connected" : "Not connected 2G Port");
-               
+
                 MessageBox.Show(serialPort1.IsOpen ? "Successfully 5G connected" : "Not connected 5G port");
 
             }
@@ -3099,6 +3100,7 @@ namespace CligenceCellIDGrabber
             try
             {
                 receivedData = receivedData + " " + currentPort.ReadExisting();
+               
             }
             catch (Exception ex)
             {
@@ -3133,7 +3135,7 @@ namespace CligenceCellIDGrabber
                             {
                                 Countok++;
                             }
-                            
+
                             // count
                             lockk = false;
                             FirstserialWrite(null);
@@ -3184,7 +3186,7 @@ namespace CligenceCellIDGrabber
                     {
                         dataCleaner2G(dataRec);
                         net = "2G";
-                     
+
                         try
                         {
                             this.Invoke(new MethodInvoker(delegate ()
@@ -3192,11 +3194,11 @@ namespace CligenceCellIDGrabber
                                 metroGrid1.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgv_RowPostPaint);
                                 metroGrid1.DataSource = dt;
 
-                               
-                            // metroGrid1.Update();
-                            // metroGrid1.Refresh();
-                            // Export2Excel(dt, "2G");
-                            Thread.Sleep(100);
+
+                                // metroGrid1.Update();
+                                // metroGrid1.Refresh();
+                                // Export2Excel(dt, "2G");
+                                Thread.Sleep(100);
                                 try
                                 {
                                     string y = dataRec;
@@ -3213,7 +3215,7 @@ namespace CligenceCellIDGrabber
                     }
 
                     // List<Dictionary<string, string>> list = clean(array);
-                  
+
 
                     // if(region!="NA")
                     // if(!lock2G)
@@ -3291,7 +3293,7 @@ namespace CligenceCellIDGrabber
             SerialPort currentPort = (SerialPort)sender;  // Determine which port triggered the event
             string portName = currentPort.PortName;  // Get the name of the port (e.g., "COM4" or "COM19")
             string receivedData = currentPort.ReadExisting();
-            
+
             string dataRec = "";
             End = DateTime.Now;
             var result = (int)End.Subtract(start).TotalMinutes;
@@ -3320,7 +3322,7 @@ namespace CligenceCellIDGrabber
             {
 
             }
-          
+
             metroComboBox1.Invoke((MethodInvoker)delegate
             {
                 //if(DdlMode.SelectedItem.ToString()=="Route")freceiv
@@ -3450,7 +3452,7 @@ namespace CligenceCellIDGrabber
                         }
                     }
                     row["(A/E/U)RFCN"] = map["arfcn"];
-                     
+
                     if (map["net"] == "3G")
                     {
                         row["ECI"] = (Convert.ToInt32(map["cellid"], 16));// map["cellid"];
@@ -3782,7 +3784,7 @@ namespace CligenceCellIDGrabber
                                 // int per = (int)(((double)(Progrsbr.Value - Progrsbr.Minimum) / (double)(Progrsbr.Maximum - Progrsbr.Minimum)) * 100);
                                 Progrsbr.Value = Progrsbr.Minimum + 1; // Temporarily set it to just above the minimum
                                 Progrsbr.Value = Progrsbr.Minimum;
-                                Progrsbr.Value = 0; 
+                                Progrsbr.Value = 0;
 
                             });
                             // serialPort2.Close();
@@ -3848,7 +3850,7 @@ namespace CligenceCellIDGrabber
                     {
                         progressbar(8);
                         scanAllForFast(Countok);
-                        if (Countok ==14 && !selectedMode.ToLower().Contains("route"))//Countok > 12
+                        if (Countok == 14 && !selectedMode.ToLower().Contains("route"))//Countok > 12
                         {
                             //if (this.loader.Visible)
                             //{
@@ -4064,7 +4066,7 @@ namespace CligenceCellIDGrabber
             serialPort2 = newPort;
             serialPort2.Open();
             serialPort2.DataReceived += serialPort2_DataReceived;
-            lock2G= true;
+            lock2G = true;
         }
         private async Task SendSerialCommandAsync(string command, int delayMilliseconds, CancellationToken cancellationToken)
         {
@@ -4682,7 +4684,7 @@ namespace CligenceCellIDGrabber
         {
             try
             {
-                
+
                 net = "ALL";
                 if (!serialPort2.IsOpen)
                 {
@@ -4722,8 +4724,8 @@ namespace CligenceCellIDGrabber
                         Thread.Sleep(1000);
                     }
                 }
-               
-                    string c4 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
+
+                string c4 = (@"AT+QNWPREFCFG = ""nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
                 //add new cmd
                 string c4n = (@"AT+QNWPREFCFG = ""nsa_nr5g_band"",1:2:3:5:7:8:12:13:14:18:20:25:26:28:29:30:38:40:41:48:66:70:71:75:76:77:78:79").Replace("\r", "").Replace("\n", "");
 
@@ -4735,7 +4737,7 @@ namespace CligenceCellIDGrabber
                     if (!serialPort2.IsOpen)
                     {
                         MessageBox.Show("Device is not connected.Scan will stop");
-                        return; 
+                        return;
                     }
                     if (1 == 1)//(Countok > 13)
                     {
@@ -4776,7 +4778,7 @@ namespace CligenceCellIDGrabber
                     {
                         await SendSerialCommandAsync(c3, 3000, cancellationToken);
                     }
-                    if (Countok > 2 && Countok < 4) 
+                    if (Countok > 2 && Countok < 4)
                     {
                         await SendSerialCommandAsync(@"AT+QNWPREFCFG= ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 2000, cancellationToken);
                     }
@@ -4836,7 +4838,7 @@ namespace CligenceCellIDGrabber
                             }
                         }
 
-                    else if (selectedcmbMode.ToLower() == "deep" && selectedMode.ToLower().Contains("spot"))
+                        else if (selectedcmbMode.ToLower() == "deep" && selectedMode.ToLower().Contains("spot"))
                         {
                             if (Countok2G >= 0 && Countok2G <= 5)
                             {
@@ -4893,7 +4895,7 @@ namespace CligenceCellIDGrabber
                         if (Countok > 10 && Countok < 13)
                         {
                             await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
-                        } 
+                        }
                     }
                     if ((Countok > 12 && Countok < 18))
                     {
@@ -4970,7 +4972,7 @@ namespace CligenceCellIDGrabber
                             await SendSerialCommandAsync("AT+QSCAN=3,1", 2000, cancellationToken);
                         }
                     }
-                    if (Countok > 37 && Countok < 39) 
+                    if (Countok > 37 && Countok < 39)
                     {
                         await SendSerialCommandAsync(@"AT+QNWPREFCFG = ""lte_band"",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:66:71", 2000, cancellationToken);
                     }
@@ -5079,7 +5081,7 @@ namespace CligenceCellIDGrabber
                         if (Countok > 67 && Countok < 70)
                         {
                             await SendSerialCommandAsync(c2, 2000, cancellationToken);
-                        } 
+                        }
 
                     }
                     if (Countok > 69 && Countok < 75)
@@ -5103,12 +5105,12 @@ namespace CligenceCellIDGrabber
                         {
                             await SendSerialCommandAsync(@"AT+QNWPREFCFG=""nr5g_band""," + bandSs[6], 2000, cancellationToken);
                         }
-                        if (Countok > 75 && Countok < 78) 
+                        if (Countok > 75 && Countok < 78)
                         {
                             await SendSerialCommandAsync(c11, 2000, cancellationToken);
                         }
                         if (Countok > 77 && Countok < 80)
-                        { 
+                        {
                             await SendSerialCommandAsync(c2, 2000, cancellationToken);
                         }
 
@@ -5390,7 +5392,7 @@ namespace CligenceCellIDGrabber
                     }
 
 
-                  
+
                 }
             }
 
@@ -6158,7 +6160,7 @@ namespace CligenceCellIDGrabber
                         MessageBox.Show($"Unexpected Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     finally
-                    {
+                    { 
                         // Release lock in case of any exception
                         lockk = false;
                     }
@@ -6214,6 +6216,27 @@ namespace CligenceCellIDGrabber
                         lockk = true;
                     }
                     catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+        }
+
+        void GPSserialWrite(string cmd)
+        {
+            if (cmd != null)
+                queue.Enqueue(cmd);
+            lock (this)
+            {
+                if (lockk == false && queue.Count > 0)
+                {
+                    try
+                    {
+                        serialPort3.Write(queue.Dequeue() + Environment.NewLine);
+                        lockk = true;
+                    }
+                    catch (Exception ex ) 
                     {
 
                     }
@@ -6841,7 +6864,7 @@ namespace CligenceCellIDGrabber
                     // FirstserialWrite(null);
                     break;
                 }
-              //  dict = dataCleaner2G(line);
+                //  dict = dataCleaner2G(line);
                 //if (dict != null)
                 //{
                 //    list.Add(dict);
@@ -6856,21 +6879,21 @@ namespace CligenceCellIDGrabber
             Dictionary<String, String> map = new Dictionary<string, string>();
 
             // Sample input data
-//             input = @"+QOPS: ""CellOne"",""CellOne"",""40459""
-//1,""2G"",103,1839,78FB,41,-73,32,-,1
-//2,""2G"",107,1839,7B23,47,-80,25,-,1
-//3,""2G"",102,1839,7B22,47,-82,23,-,1
-//4,""2G"",100,1839,78FC,47,-83,22,-,1
-//5,""2G"",109,1839,7CE4,40,-83,22,-,1
-//+QOPS: ""Vi India"",""Vi India"",""40460""
-//1,""2G"",80,98E,38FF,20,-81,24,-,1 
-//2,""2G"",82,98E,2EAB,6,-82,23,-,1
-//+QOPS: ""IND airtel"",""airtel"",""40470""
-//1,""2G"",3,294,48B,38,-58,42,-,1
-//2,""2G"",8,294,489,52,-67,33,-,1
-//3,""2G"",5,294,48A,41,-74,26,-,1
-//4,""2G"",4,294,1FE1,57,-77,23,-,1
-//5,""2G"",1,294,5F2,33,-80,20,-,1";
+            //             input = @"+QOPS: ""CellOne"",""CellOne"",""40459""
+            //1,""2G"",103,1839,78FB,41,-73,32,-,1
+            //2,""2G"",107,1839,7B23,47,-80,25,-,1
+            //3,""2G"",102,1839,7B22,47,-82,23,-,1
+            //4,""2G"",100,1839,78FC,47,-83,22,-,1
+            //5,""2G"",109,1839,7CE4,40,-83,22,-,1
+            //+QOPS: ""Vi India"",""Vi India"",""40460""
+            //1,""2G"",80,98E,38FF,20,-81,24,-,1 
+            //2,""2G"",82,98E,2EAB,6,-82,23,-,1
+            //+QOPS: ""IND airtel"",""airtel"",""40470""
+            //1,""2G"",3,294,48B,38,-58,42,-,1
+            //2,""2G"",8,294,489,52,-67,33,-,1
+            //3,""2G"",5,294,48A,41,-74,26,-,1
+            //4,""2G"",4,294,1FE1,57,-77,23,-,1
+            //5,""2G"",1,294,5F2,33,-80,20,-,1";
             try
             {
 
@@ -6885,7 +6908,7 @@ namespace CligenceCellIDGrabber
                     // Extract QOPS group details
                     string groupName = match.Groups["Name"].Value; // e.g., "CellOne" 
                     string rows = string.Empty;
-                     
+
                     // Iterate over the groups to find the dynamic group that holds the rows
                     for (int i = 1; i < match.Groups.Count; i++)
                     {
@@ -6967,7 +6990,7 @@ namespace CligenceCellIDGrabber
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
@@ -6982,7 +7005,7 @@ namespace CligenceCellIDGrabber
             //    }
             //    Console.WriteLine();
             //}
-        
+
             return dt;
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
@@ -7057,6 +7080,15 @@ namespace CligenceCellIDGrabber
                     serialPort2.Dispose();
                     //serialPort2 = null;
                 }
+                if (serialPort3 != null)
+                {
+                    if (serialPort3.IsOpen)
+                    {
+                        serialPort3.BaseStream.Dispose();
+                    }
+                    serialPort3.Dispose();
+                    //serialPort2 = null;
+                }
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startinfo = new System.Diagnostics.ProcessStartInfo();
                 startinfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
@@ -7077,19 +7109,37 @@ namespace CligenceCellIDGrabber
                 process.StartInfo.RedirectStandardOutput = true;
                 process.Start();
 
-                 ot = process.StandardOutput.ReadToEnd();
+                ot = process.StandardOutput.ReadToEnd();
                 // File.AppendAllText(outputFile, ot);
                 string port = "";
                 //changes for portfind
                 MachineType = ot.Contains("Quectel USB Modem");
                 string[] readtext = ot.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+               
+                #region For GPS Port
 
-                // int indexes = Array.FindIndex(readtext, element => element.Contains("AT Port"));
-                int[] indexess = readtext.Select((element, index) => new { element, index }).Where(e => e.element.Contains("AT Port")) // Filter elements containing "AT Port"
- .Select(e => e.index).ToArray();
+                int[] GPSindexess = readtext.Select((element, index) => new { element, index }).Where(e => e.element.Contains("Quectel Modem")).Select(e => e.index).ToArray();
+
+                string[] GPSindexes = Array.FindAll(readtext, element => element.Contains("Quectel Modem"));
+                if (GPSindexes.Count() > 0)
+                {
+                    string gpsportText = readtext[GPSindexess[0]];
+                    string subport = gpsportText.Substring(gpsportText.LastIndexOf('(') + 1, gpsportText.LastIndexOf(')'));
+                    port = subport.Replace(")", "");
+                    serialPort3.PortName = port.Trim();
+                    serialPort3.BaudRate = 115200;
+                    serialPort3.Handshake = Handshake.None;
+                    serialPort3.Parity = Parity.None;
+                    serialPort3.DataBits = 8; // Standard data bits
+                    serialPort3.StopBits = StopBits.One;
+                    Thread.Sleep(1000);
+                }
+                    #endregion
+                    // int indexes = Array.FindIndex(readtext, element => element.Contains("AT Port"));
+                    int[] indexess = readtext.Select((element, index) => new { element, index }).Where(e => e.element.Contains("AT Port")).Select(e => e.index).ToArray();
 
                 string[] indexes = Array.FindAll(readtext, element => element.Contains("AT Port"));
-               
+
                 if (indexes.Count() > 1)
                 {
 
@@ -7101,7 +7151,7 @@ namespace CligenceCellIDGrabber
                     //string portText = readtext[index];
                     //string portText = indexes[0];
 
-                    
+
                     string portText = readtext[indexess[1]];
                     //changes for portfind
                     string subport = portText.Substring(portText.LastIndexOf('(') + 1, portText.LastIndexOf(')'));
@@ -7113,8 +7163,8 @@ namespace CligenceCellIDGrabber
                     serialPort2.DataBits = 8; // Standard data bits
                     serialPort2.StopBits = StopBits.One;
                     Thread.Sleep(1000);
-                  
-                     subport = portText1.Substring(portText1.LastIndexOf('(') + 1, portText1.LastIndexOf(')'));
+
+                    subport = portText1.Substring(portText1.LastIndexOf('(') + 1, portText1.LastIndexOf(')'));
                     port = subport.Replace(")", "");
                     serialPort1.PortName = port.Trim();
                     serialPort1.BaudRate = 115200;
@@ -7123,16 +7173,17 @@ namespace CligenceCellIDGrabber
                     serialPort1.DataBits = 8; // Standard data bits
                     serialPort1.StopBits = StopBits.One;
                     Thread.Sleep(1000);
-                     serialPort2.Open();
-                    
+                    serialPort2.Open();
                     serialPort1.Open();
+                    serialPort3.Open();
+
+                    GPSserialWrite("AT+QGPS?");
+
+                    //GPSserialWrite("AT+QGPSLOC=2");
                     string c2 = "ATI";
-                    FirstserialWrite (c2);
+                    FirstserialWrite(c2);
 
                     // serialPort2.WriteLine(c2);
-                    FirstserialWrite("AT+QGPS?");
-                    serialWrite("AT+QGPS?");
-
                     try
                     {
                         // Clear any existing data in the buffers
@@ -7294,7 +7345,7 @@ namespace CligenceCellIDGrabber
                             ds.Tables.Add(tblFilteredAirtel);
                         }
                         catch (Exception ex)
-                        { 
+                        {
                             ds.Tables.Add(tblFilteredAirtel);
                         }
                         try
@@ -7511,6 +7562,71 @@ namespace CligenceCellIDGrabber
 
 
         }
+        [STAThread]
+        private void serialPort3_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort currentPort = (SerialPort)sender;  // Determine which port triggered the event
+            string portName = currentPort.PortName;  // Get the name of the port (e.g., "COM4" or "COM19")
+            string receivedData = "";
+            try
+            {
+                receivedData = receivedData + " " + currentPort.ReadExisting();
+                MessageBox.Show(receivedData);
+                if (receivedData.Contains("+QGPS"))
+                {
+                    if (receivedData.Contains("0"))
+                    {
+                        GPSserialWrite("AT+QGPS=1");
+                    }
+                    else
+                    {
+                        if (receivedData.Trim().ToUpper().Contains("OK"))
+                        {
+                            lockk = false;
+                        }
+                        GPSserialWrite("AT+QGPSLOC=2");
+                    }
+                }
+                else if (receivedData.Trim().ToUpper().Contains("OK"))
+                {
+                    lockk = false; 
+                    GPSserialWrite("AT+QGPSLOC=2");
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+           
+        }
+
+        private void serialPort3_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        {
+            MessageBox.Show("Error received: " + e.EventType);
+        }
+
+        private void serialPort3_PinChanged(object sender, SerialPinChangedEventArgs e)
+        {
+            switch (e.EventType)
+            {
+                case SerialPinChange.CDChanged:
+                    MessageBox.Show("Carrier Detect (CD) pin changed.");
+                    break;
+                case SerialPinChange.CtsChanged:
+                    MessageBox.Show("Clear-to-Send (CTS) pin changed.");
+                    break;
+                case SerialPinChange.DsrChanged:
+                    MessageBox.Show("Data Set Ready (DSR) pin changed.");
+                    break;
+                case SerialPinChange.Ring:
+                    MessageBox.Show("Ring indicator (RI) pin changed.");
+                    break;
+                default:
+                    MessageBox.Show("Unknown pin change event.");
+                    break;
+            }
+        }
 
         private void metroGrid1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -7550,6 +7666,24 @@ namespace CligenceCellIDGrabber
 
         private void serialPort1_PinChanged(object sender, SerialPinChangedEventArgs e)
         {
+            switch (e.EventType)
+            {
+                case SerialPinChange.CDChanged:
+                    MessageBox.Show("Carrier Detect (CD) pin changed.");
+                    break;
+                case SerialPinChange.CtsChanged:
+                    MessageBox.Show("Clear-to-Send (CTS) pin changed.");
+                    break;
+                case SerialPinChange.DsrChanged:
+                    MessageBox.Show("Data Set Ready (DSR) pin changed.");
+                    break;
+                case SerialPinChange.Ring:
+                    MessageBox.Show("Ring indicator (RI) pin changed.");
+                    break;
+                default:
+                    MessageBox.Show("Unknown pin change event.");
+                    break;
+            }
 
         }
 
