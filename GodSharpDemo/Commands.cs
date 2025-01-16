@@ -317,7 +317,7 @@ namespace CligenceCellIDGrabber
         [STAThread]
         private async void btnStart_Click(object sender, EventArgs e)
         {
-            Countok = 0;
+            Countok = 0; Countok2G = 0;
             //  _cancellationTokenSource = new CancellationTokenSource(); // Create a new token source for the new operation
             // await StartIoTProcessAsync(_cancellationTokenSource.Token);
             TypeText selectedNetworks = DdlMode.SelectedItem as TypeText;
@@ -7446,6 +7446,9 @@ namespace CligenceCellIDGrabber
         {
             if (lockk == false)
             {
+                Countok = 0;
+                Countok2G = 0;
+
                 dt.Clear();
                 scannedCellId.Clear();
                 //metroGrid1.Rows.Clear();
