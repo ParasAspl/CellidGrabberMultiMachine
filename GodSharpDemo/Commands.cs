@@ -6948,7 +6948,7 @@ namespace CligenceCellIDGrabber
                                 grdrow["ECI"] = values[4];// map["cellId"];
                                 grdrow["CellId"] = (Convert.ToInt32(values[4], 16)).ToString(); // map["cellId"];
                                 grdrow["CGI"] = match.Groups["Code"].Value.Substring(0, 3) + "-" + match.Groups["Code"].Value.Substring(3, 2) + "-" + grdrow["LAC/TAC"].ToString() + "-" + (Convert.ToInt32(values[4], 16)).ToString(); ;
-                                grdrow["(A/E/U)RFCN"] = "signal strength";// map["arfcn"];
+                                grdrow["(A/E/U)RFCN"] = values[3];// map["arfcn"];
                                 grdrow["ENB"] = "NA";// map["dBm"];
                                 grdrow["Network Type"] = "2G";
                                 grdrow["BSIC/PSC/PCI"] = values[5];// map["bsic"];
@@ -7128,10 +7128,11 @@ namespace CligenceCellIDGrabber
                     serialPort1.Open();
                     string c2 = "ATI";
                     FirstserialWrite (c2);
-                    
-                   // serialPort2.WriteLine(c2);
-                 //   FirstserialWrite("AT+QGPS?");
-                    
+
+                    // serialPort2.WriteLine(c2);
+                    FirstserialWrite("AT+QGPS?");
+                    serialWrite("AT+QGPS?");
+
                     try
                     {
                         // Clear any existing data in the buffers
